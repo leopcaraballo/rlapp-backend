@@ -17,3 +17,6 @@
 /home/lcaraballo/Documentos/Sofka Projects/Projects/rlapp-backend/src/Services/WaitingRoom/WaitingRoom.Infrastructure/obj/Debug/net10.0/refint/WaitingRoom.Infrastructure.dll
 /home/lcaraballo/Documentos/Sofka Projects/Projects/rlapp-backend/src/Services/WaitingRoom/WaitingRoom.Infrastructure/obj/Debug/net10.0/WaitingRoom.Infrastructure.pdb
 /home/lcaraballo/Documentos/Sofka Projects/Projects/rlapp-backend/src/Services/WaitingRoom/WaitingRoom.Infrastructure/obj/Debug/net10.0/ref/WaitingRoom.Infrastructure.dll
+/home/lcaraballo/Documentos/Sofka Projects/Projects/rlapp-backend/src/Services/WaitingRoom/WaitingRoom.Infrastructure/bin/Debug/net10.0/WaitingRoom.Projections.dll
+/home/lcaraballo/Documentos/Sofka Projects/Projects/rlapp-backend/src/Services/WaitingRoom/WaitingRoom.Infrastructure/bin/Debug/net10.0/WaitingRoom.Projections.pdb
+/home/lcaraballo/Documentos/Sofka Projects/Projects/rlapp-backend/src/Services/WaitingRoom/WaitingRoom.Infrastructure/bin/Debug/net10.0/WaitingRoom.Projections.xml

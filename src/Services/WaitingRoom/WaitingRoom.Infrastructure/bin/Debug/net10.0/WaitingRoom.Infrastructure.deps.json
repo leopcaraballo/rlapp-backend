@@ -14,7 +14,8 @@
           "Npgsql": "8.0.5",
           "RabbitMQ.Client": "6.8.1",
           "WaitingRoom.Application": "1.0.0",
-          "WaitingRoom.Domain": "1.0.0"
+          "WaitingRoom.Domain": "1.0.0",
+          "WaitingRoom.Projections": "1.0.0"
         },
         "runtime": {
           "WaitingRoom.Infrastructure.dll": {}
@@ -103,6 +104,19 @@
             "fileVersion": "1.0.0.0"
           }
         }
+      },
+      "WaitingRoom.Projections/1.0.0": {
+        "dependencies": {
+          "Microsoft.Extensions.Logging.Abstractions": "8.0.0",
+          "WaitingRoom.Application": "1.0.0",
+          "WaitingRoom.Domain": "1.0.0"
+        },
+        "runtime": {
+          "WaitingRoom.Projections.dll": {
+            "assemblyVersion": "1.0.0.0",
+            "fileVersion": "1.0.0.0"
+          }
+        }
       }
     }
   },
@@ -165,6 +179,11 @@
       "sha512": ""
     },
     "WaitingRoom.Domain/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "WaitingRoom.Projections/1.0.0": {
       "type": "project",
       "serviceable": false,
       "sha512": ""

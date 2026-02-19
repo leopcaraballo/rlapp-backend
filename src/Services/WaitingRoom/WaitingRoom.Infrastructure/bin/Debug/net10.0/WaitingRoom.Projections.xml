@@ -1,0 +1,603 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>WaitingRoom.Projections</name>
+    </assembly>
+    <members>
+        <member name="T:WaitingRoom.Projections.Abstractions.IProjection">
+             <summary>
+             Projection orchestrator that manages event handlers and state.
+            
+             Responsibilities:
+             - Register event handlers
+             - Coordinate event processing
+             - Manage projection lifecycle
+             - Handle rebuilds
+            
+             A projection is a complete read model derived from domain events.
+             Example: WaitingRoomProjection builds WaitingRoomMonitorView and QueueStateView.
+            
+             Key properties:
+             - Idempotent: same events → same final state
+             - Rebuildable: can recreate from events
+             - Observable: tracks progress via checkpoints
+             </summary>
+        </member>
+        <member name="P:WaitingRoom.Projections.Abstractions.IProjection.ProjectionId">
+            <summary>
+            Unique identifier for this projection.
+            Used in checkpoints and logging.
+            </summary>
+        </member>
+        <member name="M:WaitingRoom.Projections.Abstractions.IProjection.GetHandlers">
+            <summary>
+            Gets all event handlers registered for this projection.
+            </summary>
+        </member>
+        <member name="M:WaitingRoom.Projections.Abstractions.IProjection.GetCheckpointAsync(System.Threading.CancellationToken)">
+            <summary>
+            Gets current checkpoint (progress tracking).
+            Returns null if projection never run.
+            </summary>
+            <param name="cancellationToken">Cancellation token.</param>
+            <returns>Current checkpoint or null.</returns>
+        </member>
+        <member name="M:WaitingRoom.Projections.Abstractions.IProjection.RebuildAsync(System.Threading.CancellationToken)">
+             <summary>
+             Rebuilds projection from scratch.
+             Clears all state and replays all events from EventStore.
+             Used for:
+             - Initial population
+             - Schema changes
+             - Disaster recovery
+             - Verification (compare rebuild with incremental)
+            
+             This is a potentially long-running operation.
+             Should run asynchronously.
+             </summary>
+             <param name="cancellationToken">Cancellation token for interruption.</param>
+        </member>
+        <member name="M:WaitingRoom.Projections.Abstractions.IProjection.ProcessEventAsync(BuildingBlocks.EventSourcing.DomainEvent,System.Threading.CancellationToken)">
+            <summary>
+            Processes a single event through this projection.
+            Used by Outbox or event stream subscriber.
+            </summary>
+            <param name="event">Domain event to process.</param>
+            <param name="cancellationToken">Cancellation token.</param>
+        </member>
+        <member name="M:WaitingRoom.Projections.Abstractions.IProjection.ProcessEventsAsync(System.Collections.Generic.IEnumerable{BuildingBlocks.EventSourcing.DomainEvent},System.Threading.CancellationToken)">
+            <summary>
+            Processes multiple events idempotently.
+            Used for batch operations and rebuild.
+            </summary>
+            <param name="events">Domain events to process.</param>
+            <param name="cancellationToken">Cancellation token.</param>
+        </member>
+        <member name="T:WaitingRoom.Projections.Abstractions.IProjectionContext">
+             <summary>
+             Port for projection state management and idempotency tracking.
+            
+             Responsibilities:
+             - Provide transactional updates to read models
+             - Track processed events (idempotency keys)
+             - Manage checkpoints
+             - Clear state for rebuilds
+            
+             All operations within a context should be atomic:
+             - Either all succeed or all rollback
+             - No partial state
+            
+             Implementation provided by Infrastructure layer.
+             </summary>
+        </member>
+        <member name="M:WaitingRoom.Projections.Abstractions.IProjectionContext.AlreadyProcessedAsync(System.String,System.Threading.CancellationToken)">
+            <summary>
+            Checks if an event has already been processed.
+            Used for idempotency: if key exists, skip processing.
+            </summary>
+            <param name="idempotencyKey">Unique key for this event.</param>
+            <param name="cancellationToken">Cancellation token.</param>
+            <returns>True if event already processed.</returns>
+        </member>
+        <member name="M:WaitingRoom.Projections.Abstractions.IProjectionContext.MarkProcessedAsync(System.String,System.Threading.CancellationToken)">
+            <summary>
+            Records that an event has been processed.
+            Prevents duplicate processing on retry.
+            </summary>
+            <param name="idempotencyKey">Unique key for this event.</param>
+            <param name="cancellationToken">Cancellation token.</param>
+        </member>
+        <member name="M:WaitingRoom.Projections.Abstractions.IProjectionContext.GetCheckpointAsync(System.String,System.Threading.CancellationToken)">
+            <summary>
+            Gets current projection checkpoint.
+            Returns null if projection not yet created.
+            </summary>
+            <param name="projectionId">Projection identifier.</param>
+            <param name="cancellationToken">Cancellation token.</param>
+            <returns>Current checkpoint or null.</returns>
+        </member>
+        <member name="M:WaitingRoom.Projections.Abstractions.IProjectionContext.SaveCheckpointAsync(WaitingRoom.Projections.Abstractions.ProjectionCheckpoint,System.Threading.CancellationToken)">
+            <summary>
+            Saves checkpoint after event processing.
+            Used to track progress and resume after interruption.
+            </summary>
+            <param name="checkpoint">Checkpoint to save.</param>
+            <param name="cancellationToken">Cancellation token.</param>
+        </member>
+        <member name="M:WaitingRoom.Projections.Abstractions.IProjectionContext.ClearAsync(System.String,System.Threading.CancellationToken)">
+            <summary>
+            Clears all projection state and idempotency keys.
+            Used during full rebuild.
+            </summary>
+            <param name="projectionId">Projection to clear.</param>
+            <param name="cancellationToken">Cancellation token.</param>
+        </member>
+        <member name="M:WaitingRoom.Projections.Abstractions.IProjectionContext.BeginTransactionAsync">
+            <summary>
+            Gets transaction scope for atomic updates.
+            Ensures all-or-nothing semantics.
+            </summary>
+            <returns>Transaction scope (should be used with using statement).</returns>
+        </member>
+        <member name="T:WaitingRoom.Projections.Abstractions.IProjectionHandler">
+             <summary>
+             Handler for processing a specific domain event into projection state.
+            
+             Responsibilities:
+             - Extract data from domain event
+             - Perform idempotency check
+             - Update read model state deterministically
+             - Record processing via checkpoint
+            
+             Key invariants:
+             - Must be idempotent (same event twice = same state)
+             - Must process events in order
+             - Must be deterministic (no random values, no current time)
+             - Must not contain domain logic
+             - Must not call domain layer
+            
+             Concurrency:
+             - Handlers should be stateless and thread-safe
+             - Concurrency controlled by IProjectionContext
+             </summary>
+        </member>
+        <member name="P:WaitingRoom.Projections.Abstractions.IProjectionHandler.EventName">
+            <summary>
+            Gets the event type this handler processes.
+            Used to route events to correct handler.
+            </summary>
+        </member>
+        <member name="M:WaitingRoom.Projections.Abstractions.IProjectionHandler.HandleAsync(BuildingBlocks.EventSourcing.DomainEvent,WaitingRoom.Projections.Abstractions.IProjectionContext,System.Threading.CancellationToken)">
+             <summary>
+             Handles a domain event idempotently.
+            
+             Invariants enforced:
+             - Same event processed twice produces same state
+             - Side effects are transactional
+             - No domain logic, just data transformation
+            
+             Pattern:
+             1. Check idempotency (already processed?)
+             2. If yes, return early
+             3. Extract data from event
+             4. Update read model(s) deterministically
+             5. Mark as processed (idempotency key)
+             </summary>
+             <param name="event">Domain event to process.</param>
+             <param name="context">Projection context for state management.</param>
+             <param name="cancellationToken">Cancellation token.</param>
+             <exception cref="T:System.InvalidOperationException">If event data invalid.</exception>
+        </member>
+        <member name="T:WaitingRoom.Projections.Abstractions.IWaitingRoomProjectionContext">
+             <summary>
+             Extended context for WaitingRoom projections.
+            
+             Extends base IProjectionContext with domain-specific query and update methods.
+             This keeps handlers clean and focused on event handling logic.
+            
+             Responsibilities:
+             - Update WaitingRoomMonitorView state
+             - Update QueueStateView state
+             - Query current view state
+             - Manage patient data
+             </summary>
+        </member>
+        <member name="M:WaitingRoom.Projections.Abstractions.IWaitingRoomProjectionContext.UpdateMonitorViewAsync(System.String,System.String,System.String,System.Threading.CancellationToken)">
+            <summary>
+            Updates monitor view counters.
+            Used when patient priority changes or checks in.
+            </summary>
+            <param name="queueId">Queue identifier.</param>
+            <param name="priority">Priority level (high, normal, low).</param>
+            <param name="operation">increment or decrement.</param>
+            <param name="cancellationToken">Cancellation token.</param>
+        </member>
+        <member name="M:WaitingRoom.Projections.Abstractions.IWaitingRoomProjectionContext.AddPatientToQueueAsync(System.String,WaitingRoom.Projections.Views.PatientInQueueDto,System.Threading.CancellationToken)">
+            <summary>
+            Adds patient to queue state view.
+            </summary>
+            <param name="queueId">Queue identifier.</param>
+            <param name="patient">Patient data to add.</param>
+            <param name="cancellationToken">Cancellation token.</param>
+        </member>
+        <member name="M:WaitingRoom.Projections.Abstractions.IWaitingRoomProjectionContext.RemovePatientFromQueueAsync(System.String,System.String,System.Threading.CancellationToken)">
+            <summary>
+            Removes patient from queue state view.
+            (Called when patient served or removed).
+            </summary>
+            <param name="queueId">Queue identifier.</param>
+            <param name="patientId">Patient to remove.</param>
+            <param name="cancellationToken">Cancellation token.</param>
+        </member>
+        <member name="M:WaitingRoom.Projections.Abstractions.IWaitingRoomProjectionContext.GetMonitorViewAsync(System.String,System.Threading.CancellationToken)">
+            <summary>
+            Gets current state of monitor view.
+            Used for informational/test purposes.
+            </summary>
+            <param name="queueId">Queue identifier.</param>
+            <param name="cancellationToken">Cancellation token.</param>
+            <returns>Current monitor view or null if not found.</returns>
+        </member>
+        <member name="M:WaitingRoom.Projections.Abstractions.IWaitingRoomProjectionContext.GetQueueStateViewAsync(System.String,System.Threading.CancellationToken)">
+            <summary>
+            Gets current state of queue view.
+            Used for queries and test verification.
+            </summary>
+            <param name="queueId">Queue identifier.</param>
+            <param name="cancellationToken">Cancellation token.</param>
+            <returns>Current queue state view.</returns>
+        </member>
+        <member name="M:WaitingRoom.Projections.Abstractions.IWaitingRoomProjectionContext.ClearQueueProjectionAsync(System.String,System.Threading.CancellationToken)">
+            <summary>
+            Clears all queue-related projection data.
+            Used during rebuild.
+            </summary>
+            <param name="queueId">Queue to clear.</param>
+            <param name="cancellationToken">Cancellation token.</param>
+        </member>
+        <member name="T:WaitingRoom.Projections.Abstractions.ProjectionCheckpoint">
+             <summary>
+             Checkpoint for tracking projection progress.
+            
+             Used to:
+             - Track which events have been processed
+             - Resume after interruption
+             - Enforce idempotency (prevent duplicate processing)
+             - Enable incremental updates
+            
+             Invariants:
+             - Checkpoints are immutable once created
+             - Version represents last event processed
+             - IdempotencyKey prevents duplicate checkpoint saves
+             </summary>
+        </member>
+        <member name="P:WaitingRoom.Projections.Abstractions.ProjectionCheckpoint.ProjectionId">
+            <summary>
+            Unique identifier for this projection.
+            </summary>
+        </member>
+        <member name="P:WaitingRoom.Projections.Abstractions.ProjectionCheckpoint.LastEventVersion">
+            <summary>
+            Last event version successfully processed.
+            Used to determine which events to process next.
+            </summary>
+        </member>
+        <member name="P:WaitingRoom.Projections.Abstractions.ProjectionCheckpoint.CheckpointedAt">
+            <summary>
+            When this checkpoint was created.
+            Used for monitoring projection lag.
+            </summary>
+        </member>
+        <member name="P:WaitingRoom.Projections.Abstractions.ProjectionCheckpoint.IdempotencyKey">
+            <summary>
+            Unique key for idempotent checkpoint persistence.
+            Prevents duplicate checkpoint saves on network retry.
+            </summary>
+        </member>
+        <member name="P:WaitingRoom.Projections.Abstractions.ProjectionCheckpoint.Status">
+            <summary>
+            Optional diagnostic info (e.g., "rebuilding", "catching-up").
+            </summary>
+        </member>
+        <member name="T:WaitingRoom.Projections.Handlers.PatientCheckedInProjectionHandler">
+             <summary>
+             Projection handler for PatientCheckedIn domain event.
+            
+             This handler:
+             - Listens for PatientCheckedIn events from WaitingQueue aggregate
+             - Updates WaitingRoomMonitorView (counts by priority)
+             - Updates QueueStateView (patient list)
+             - Maintains idempotency
+             - Supports deterministic replay
+            
+             Key responsibility:
+             - Transform domain event into denormalized read model data
+             - Ensure idempotency via idempotency key
+             - Track processing via checkpoint
+            
+             NO business logic here. Only data transformation.
+             </summary>
+        </member>
+        <member name="P:WaitingRoom.Projections.Handlers.PatientCheckedInProjectionHandler.EventName">
+            <summary>
+            Domain event type this handler processes.
+            </summary>
+        </member>
+        <member name="M:WaitingRoom.Projections.Handlers.PatientCheckedInProjectionHandler.HandleAsync(BuildingBlocks.EventSourcing.DomainEvent,WaitingRoom.Projections.Abstractions.IProjectionContext,System.Threading.CancellationToken)">
+             <summary>
+             Handles PatientCheckedIn event idempotently.
+            
+             Process:
+             1. Check if already processed (idempotency)
+             2. Extract event data
+             3. Update monitor view (increment counters)
+             4. Update queue state view (add patient)
+             5. Mark as processed
+            
+             Invariant: Same event processed twice = identical state.
+             </summary>
+        </member>
+        <member name="M:WaitingRoom.Projections.Handlers.PatientCheckedInProjectionHandler.GenerateIdempotencyKey(WaitingRoom.Domain.Events.PatientCheckedIn)">
+            <summary>
+            Generates deterministic idempotency key for this event.
+            Same event always produces same key.
+            Key format: "queueId:aggregateId:eventId"
+            </summary>
+        </member>
+        <member name="T:WaitingRoom.Projections.Implementations.WaitingRoomProjectionEngine">
+             <summary>
+             WaitingRoom projection engine.
+            
+             Orchestrates:
+             - Event handler registration
+             - Event routing to correct handler
+             - Checkpoint management
+             - Rebuild process
+            
+             This projection handles all WaitingQueue aggregate events
+             and keeps WaitingRoomMonitorView and QueueStateView in sync.
+            
+             Invariants:
+             - Handlers are stateless and reusable
+             - Events processed in order
+             - Same events → same state (deterministic)
+             - Idempotent: processing twice = no change
+             </summary>
+        </member>
+        <member name="M:WaitingRoom.Projections.Implementations.WaitingRoomProjectionEngine.GetHandlers">
+            <summary>
+            Gets all registered event handlers.
+            </summary>
+        </member>
+        <member name="M:WaitingRoom.Projections.Implementations.WaitingRoomProjectionEngine.GetCheckpointAsync(System.Threading.CancellationToken)">
+            <summary>
+            Gets current checkpoint (progress tracking).
+            Returns null if projection never run.
+            </summary>
+        </member>
+        <member name="M:WaitingRoom.Projections.Implementations.WaitingRoomProjectionEngine.RebuildAsync(System.Threading.CancellationToken)">
+             <summary>
+             Rebuilds projection from scratch.
+            
+             Process:
+             1. Log rebuild start
+             2. Clear all projection data and idempotency keys
+             3. Get ALL events from EventStore in order
+             4. Process each event through appropriate handler
+             5. Update checkpoint with final version
+             6. Log completion
+            
+             This is deterministic:
+             - Same events always produce same state
+             - Result identical to incremental processing
+             - Useful for validation, migration, recovery
+             </summary>
+        </member>
+        <member name="M:WaitingRoom.Projections.Implementations.WaitingRoomProjectionEngine.ProcessEventAsync(BuildingBlocks.EventSourcing.DomainEvent,System.Threading.CancellationToken)">
+            <summary>
+            Processes a single event through projection.
+            Used by event stream subscribers or Outbox worker.
+            </summary>
+        </member>
+        <member name="M:WaitingRoom.Projections.Implementations.WaitingRoomProjectionEngine.ProcessEventsAsync(System.Collections.Generic.IEnumerable{BuildingBlocks.EventSourcing.DomainEvent},System.Threading.CancellationToken)">
+            <summary>
+            Processes multiple events (batch operation).
+            Used during rebuild or batch imports.
+            </summary>
+        </member>
+        <member name="M:WaitingRoom.Projections.Implementations.WaitingRoomProjectionEngine.ProcessEventInternalAsync(BuildingBlocks.EventSourcing.DomainEvent,System.Threading.CancellationToken)">
+            <summary>
+            Internal event processing logic.
+            Routes event to appropriate handler.
+            </summary>
+        </member>
+        <member name="T:WaitingRoom.Projections.Views.PatientInQueueDto">
+             <summary>
+             Data transfer object for a patient in the queue.
+             Part of QueueStateView but also useful in other projections.
+            
+             Denormalized structure optimized for display.
+             No business logic, pure data.
+             </summary>
+        </member>
+        <member name="P:WaitingRoom.Projections.Views.PatientInQueueDto.PatientId">
+            <summary>
+            Patient unique identifier.
+            </summary>
+        </member>
+        <member name="P:WaitingRoom.Projections.Views.PatientInQueueDto.PatientName">
+            <summary>
+            Patient full name.
+            Denormalized from domain event.
+            </summary>
+        </member>
+        <member name="P:WaitingRoom.Projections.Views.PatientInQueueDto.Priority">
+            <summary>
+            Priority level (high, normal, low).
+            Used for sorting and monitoring.
+            </summary>
+        </member>
+        <member name="P:WaitingRoom.Projections.Views.PatientInQueueDto.CheckInTime">
+            <summary>
+            When patient checked into queue.
+            Used for calculating wait time.
+            </summary>
+        </member>
+        <member name="P:WaitingRoom.Projections.Views.PatientInQueueDto.WaitTimeMinutes">
+            <summary>
+            Current wait time in minutes.
+            Calculated projection field (CheckInTime to now).
+            </summary>
+        </member>
+        <member name="T:WaitingRoom.Projections.Views.QueueStateView">
+             <summary>
+             Detailed view of current queue state.
+            
+             Used for:
+             - Detailed monitoring dashboard
+             - Patient list display
+             - Queue management UI
+             - Real-time status checks
+            
+             This is a denormalized view — optimized for queries, not normalized.
+             Can be regenerated entirely from domain events.
+             No business logic, pure presentation data.
+            
+             Idempotency:
+             - Building same queue twice from events produces identical view
+             - Event replay deterministic
+             - Query always returns current state
+             </summary>
+        </member>
+        <member name="P:WaitingRoom.Projections.Views.QueueStateView.QueueId">
+            <summary>
+            Queue unique identifier.
+            </summary>
+        </member>
+        <member name="P:WaitingRoom.Projections.Views.QueueStateView.CurrentCount">
+            <summary>
+            Number of patients currently in queue.
+            </summary>
+        </member>
+        <member name="P:WaitingRoom.Projections.Views.QueueStateView.MaxCapacity">
+            <summary>
+            Maximum capacity.
+            Denormalized from domain state.
+            </summary>
+        </member>
+        <member name="P:WaitingRoom.Projections.Views.QueueStateView.IsAtCapacity">
+            <summary>
+            Is queue at max capacity?
+            Calculated field: CurrentCount >= MaxCapacity.
+            </summary>
+        </member>
+        <member name="P:WaitingRoom.Projections.Views.QueueStateView.AvailableSpots">
+            <summary>
+            Remaining spots available.
+            Calculated: MaxCapacity - CurrentCount.
+            </summary>
+        </member>
+        <member name="P:WaitingRoom.Projections.Views.QueueStateView.PatientsInQueue">
+            <summary>
+            Patients currently in queue.
+            Sorted by priority and check-in time.
+            </summary>
+        </member>
+        <member name="P:WaitingRoom.Projections.Views.QueueStateView.ProjectedAt">
+            <summary>
+            When this view was last updated (projected).
+            Used for monitoring projection lag.
+            </summary>
+        </member>
+        <member name="P:WaitingRoom.Projections.Views.QueueStateView.OccupancyPercentage">
+            <summary>
+            Gets occupancy percentage.
+            </summary>
+        </member>
+        <member name="T:WaitingRoom.Projections.Views.WaitingRoomMonitorView">
+             <summary>
+             Monitor view for waiting room dashboard.
+            
+             Used for:
+             - High-level operations dashboard
+             - KPI monitoring (wait times, queue depth)
+             - Real-time metrics display
+             - Admin overview
+            
+             This view aggregates statistics across a queue.
+             Denormalized for fast queries.
+             Can be rebuilt from domain events.
+            
+             Key point:
+             - No domain logic
+             - Purely denormalized metrics
+             - Deterministic replay-based
+             </summary>
+        </member>
+        <member name="P:WaitingRoom.Projections.Views.WaitingRoomMonitorView.QueueId">
+            <summary>
+            Queue unique identifier.
+            </summary>
+        </member>
+        <member name="P:WaitingRoom.Projections.Views.WaitingRoomMonitorView.TotalPatientsWaiting">
+            <summary>
+            Total patients currently waiting.
+            </summary>
+        </member>
+        <member name="P:WaitingRoom.Projections.Views.WaitingRoomMonitorView.HighPriorityCount">
+            <summary>
+            Patients with high priority status.
+            </summary>
+        </member>
+        <member name="P:WaitingRoom.Projections.Views.WaitingRoomMonitorView.NormalPriorityCount">
+            <summary>
+            Patients with normal priority status.
+            </summary>
+        </member>
+        <member name="P:WaitingRoom.Projections.Views.WaitingRoomMonitorView.LowPriorityCount">
+            <summary>
+            Patients with low priority status.
+            </summary>
+        </member>
+        <member name="P:WaitingRoom.Projections.Views.WaitingRoomMonitorView.LastPatientCheckedInAt">
+            <summary>
+            When the last patient checked in.
+            Null if no patients in queue.
+            Used to calculate queue activity.
+            </summary>
+        </member>
+        <member name="P:WaitingRoom.Projections.Views.WaitingRoomMonitorView.AverageWaitTimeMinutes">
+            <summary>
+            Average wait time in minutes.
+            Calculated from all patients in queue.
+            </summary>
+        </member>
+        <member name="P:WaitingRoom.Projections.Views.WaitingRoomMonitorView.UtilizationPercentage">
+            <summary>
+            Queue utilization percentage.
+            Will be calculated in query projection.
+            </summary>
+        </member>
+        <member name="P:WaitingRoom.Projections.Views.WaitingRoomMonitorView.ProjectedAt">
+            <summary>
+            When this view was last updated.
+            Used for monitoring projection staleness.
+            </summary>
+        </member>
+        <member name="P:WaitingRoom.Projections.Views.WaitingRoomMonitorView.PriorityDistribution">
+            <summary>
+            Gets priority distribution.
+            </summary>
+        </member>
+        <member name="P:WaitingRoom.Projections.Views.WaitingRoomMonitorView.IsHighLoad">
+            <summary>
+            Is queue experiencing high load?
+            </summary>
+        </member>
+        <member name="P:WaitingRoom.Projections.Views.WaitingRoomMonitorView.IsEmpty">
+            <summary>
+            Is queue empty?
+            </summary>
+        </member>
+    </members>
+</doc>

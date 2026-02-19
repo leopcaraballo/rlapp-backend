@@ -1,0 +1,5 @@
+/home/lcaraballo/Documentos/Sofka Projects/Projects/rlapp-backend/src/Services/WaitingRoom/WaitingRoom.Infrastructure/obj/Release/net10.0/WaitingRoom.Infrastructure.csproj.AssemblyReference.cache
+/home/lcaraballo/Documentos/Sofka Projects/Projects/rlapp-backend/src/Services/WaitingRoom/WaitingRoom.Infrastructure/obj/Release/net10.0/WaitingRoom.Infrastructure.GeneratedMSBuildEditorConfig.editorconfig
+/home/lcaraballo/Documentos/Sofka Projects/Projects/rlapp-backend/src/Services/WaitingRoom/WaitingRoom.Infrastructure/obj/Release/net10.0/WaitingRoom.Infrastructure.AssemblyInfoInputs.cache
+/home/lcaraballo/Documentos/Sofka Projects/Projects/rlapp-backend/src/Services/WaitingRoom/WaitingRoom.Infrastructure/obj/Release/net10.0/WaitingRoom.Infrastructure.AssemblyInfo.cs
+/home/lcaraballo/Documentos/Sofka Projects/Projects/rlapp-backend/src/Services/WaitingRoom/WaitingRoom.Infrastructure/obj/Release/net10.0/WaitingRoom.Infrastructure.csproj.CoreCompileInputs.cache
