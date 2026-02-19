@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("BuildingBlocks.EventSourcing")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Release")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+1819951eb6b0a5ca9e4d4269ec0b18baf0a9acf0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+a5c660ae6cfefd2d555a92664737f369fa5d00c6")]
 [assembly: System.Reflection.AssemblyProductAttribute("BuildingBlocks.EventSourcing")]
 [assembly: System.Reflection.AssemblyTitleAttribute("BuildingBlocks.EventSourcing")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

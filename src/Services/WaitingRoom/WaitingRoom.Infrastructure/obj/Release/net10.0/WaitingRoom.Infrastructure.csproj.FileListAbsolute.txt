@@ -9,12 +9,9 @@
 /home/lcaraballo/Documentos/Sofka Projects/Projects/rlapp-backend/src/Services/WaitingRoom/WaitingRoom.Infrastructure/bin/Release/net10.0/BuildingBlocks.EventSourcing.dll
 /home/lcaraballo/Documentos/Sofka Projects/Projects/rlapp-backend/src/Services/WaitingRoom/WaitingRoom.Infrastructure/bin/Release/net10.0/WaitingRoom.Application.dll
 /home/lcaraballo/Documentos/Sofka Projects/Projects/rlapp-backend/src/Services/WaitingRoom/WaitingRoom.Infrastructure/bin/Release/net10.0/WaitingRoom.Domain.dll
-/home/lcaraballo/Documentos/Sofka Projects/Projects/rlapp-backend/src/Services/WaitingRoom/WaitingRoom.Infrastructure/bin/Release/net10.0/WaitingRoom.Projections.dll
 /home/lcaraballo/Documentos/Sofka Projects/Projects/rlapp-backend/src/Services/WaitingRoom/WaitingRoom.Infrastructure/bin/Release/net10.0/WaitingRoom.Application.pdb
 /home/lcaraballo/Documentos/Sofka Projects/Projects/rlapp-backend/src/Services/WaitingRoom/WaitingRoom.Infrastructure/bin/Release/net10.0/WaitingRoom.Domain.pdb
 /home/lcaraballo/Documentos/Sofka Projects/Projects/rlapp-backend/src/Services/WaitingRoom/WaitingRoom.Infrastructure/bin/Release/net10.0/BuildingBlocks.EventSourcing.pdb
-/home/lcaraballo/Documentos/Sofka Projects/Projects/rlapp-backend/src/Services/WaitingRoom/WaitingRoom.Infrastructure/bin/Release/net10.0/WaitingRoom.Projections.pdb
-/home/lcaraballo/Documentos/Sofka Projects/Projects/rlapp-backend/src/Services/WaitingRoom/WaitingRoom.Infrastructure/bin/Release/net10.0/WaitingRoom.Projections.xml
 /home/lcaraballo/Documentos/Sofka Projects/Projects/rlapp-backend/src/Services/WaitingRoom/WaitingRoom.Infrastructure/obj/Release/net10.0/WaitingR.1E000B6D.Up2Date
 /home/lcaraballo/Documentos/Sofka Projects/Projects/rlapp-backend/src/Services/WaitingRoom/WaitingRoom.Infrastructure/obj/Release/net10.0/WaitingRoom.Infrastructure.dll
 /home/lcaraballo/Documentos/Sofka Projects/Projects/rlapp-backend/src/Services/WaitingRoom/WaitingRoom.Infrastructure/obj/Release/net10.0/refint/WaitingRoom.Infrastructure.dll

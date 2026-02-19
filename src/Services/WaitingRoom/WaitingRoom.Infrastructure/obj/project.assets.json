@@ -127,22 +127,6 @@
         "runtime": {
           "bin/placeholder/WaitingRoom.Domain.dll": {}
         }
-      },
-      "WaitingRoom.Projections/1.0.0": {
-        "type": "project",
-        "framework": ".NETCoreApp,Version=v10.0",
-        "dependencies": {
-          "BuildingBlocks.EventSourcing": "1.0.0",
-          "Microsoft.Extensions.Logging.Abstractions": "8.0.0",
-          "WaitingRoom.Application": "1.0.0",
-          "WaitingRoom.Domain": "1.0.0"
-        },
-        "compile": {
-          "bin/placeholder/WaitingRoom.Projections.dll": {}
-        },
-        "runtime": {
-          "bin/placeholder/WaitingRoom.Projections.dll": {}
-        }
       }
     }
   },
@@ -357,11 +341,6 @@
       "type": "project",
       "path": "../WaitingRoom.Domain/WaitingRoom.Domain.csproj",
       "msbuildProject": "../WaitingRoom.Domain/WaitingRoom.Domain.csproj"
-    },
-    "WaitingRoom.Projections/1.0.0": {
-      "type": "project",
-      "path": "../WaitingRoom.Projections/WaitingRoom.Projections.csproj",
-      "msbuildProject": "../WaitingRoom.Projections/WaitingRoom.Projections.csproj"
     }
   },
   "projectFileDependencyGroups": {
@@ -372,8 +351,7 @@
       "Npgsql >= 8.0.5",
       "RabbitMQ.Client >= 6.8.1",
       "WaitingRoom.Application >= 1.0.0",
-      "WaitingRoom.Domain >= 1.0.0",
-      "WaitingRoom.Projections >= 1.0.0"
+      "WaitingRoom.Domain >= 1.0.0"
     ]
   },
   "packageFolders": {
@@ -410,9 +388,6 @@
             },
             "/home/lcaraballo/Documentos/Sofka Projects/Projects/rlapp-backend/src/Services/WaitingRoom/WaitingRoom.Domain/WaitingRoom.Domain.csproj": {
               "projectPath": "/home/lcaraballo/Documentos/Sofka Projects/Projects/rlapp-backend/src/Services/WaitingRoom/WaitingRoom.Domain/WaitingRoom.Domain.csproj"
-            },
-            "/home/lcaraballo/Documentos/Sofka Projects/Projects/rlapp-backend/src/Services/WaitingRoom/WaitingRoom.Projections/WaitingRoom.Projections.csproj": {
-              "projectPath": "/home/lcaraballo/Documentos/Sofka Projects/Projects/rlapp-backend/src/Services/WaitingRoom/WaitingRoom.Projections/WaitingRoom.Projections.csproj"
             }
           }
         }
