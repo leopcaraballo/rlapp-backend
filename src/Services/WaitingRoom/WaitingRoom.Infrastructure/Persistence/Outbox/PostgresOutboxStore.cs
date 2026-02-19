@@ -5,7 +5,7 @@ using Dapper;
 using Npgsql;
 using WaitingRoom.Infrastructure.Persistence.EventStore;
 
-internal sealed class PostgresOutboxStore
+internal sealed class PostgresOutboxStore : IOutboxStore
 {
     private readonly string _connectionString;
 

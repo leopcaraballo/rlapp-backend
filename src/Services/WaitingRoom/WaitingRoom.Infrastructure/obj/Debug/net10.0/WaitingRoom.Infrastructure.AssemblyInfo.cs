@@ -13,10 +13,12 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("WaitingRoom.Infrastructure")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+4890f062f5fb35562a44b8aee2afac5f74a36275")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+eb7b2d0784ce810ba1790ac561be3e0f10bc6bf5")]
 [assembly: System.Reflection.AssemblyProductAttribute("WaitingRoom.Infrastructure")]
 [assembly: System.Reflection.AssemblyTitleAttribute("WaitingRoom.Infrastructure")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
+[assembly: System.Runtime.CompilerServices.InternalsVisibleTo("WaitingRoom.Worker")]
+[assembly: System.Runtime.CompilerServices.InternalsVisibleTo("WaitingRoom.Tests.Integration")]
 
 // Generado por la clase WriteCodeFragment de MSBuild.
 
