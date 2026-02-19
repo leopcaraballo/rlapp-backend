@@ -7,12 +7,14 @@
 ### 1. **Dapper Dynamic Property Mapping (Case Sensitivity)**
 
 **Problem:**
+
 - PostgreSQL returns column names in lowercase (e.g., `totaleventsprocessed`)
 - C# code was accessing properties with PascalCase (e.g., `result.TotalEventsProcessed`)
 - Dapper uses lowercase names for dynamic object properties
 - This caused all lag metrics to be `null`, resulting in `0` values being returned
 
 **Root Cause:**
+
 ```sql
 SELECT COUNT(*) as TotalEventsProcessed, ...
 ```
@@ -21,6 +23,7 @@ PostgreSQL downcases the alias to `totaleventsprocessed`, but C# tried to access
 
 **Fix:**
 Changed all property accesses in `GetStatisticsAsync` to use lowercase:
+
 - `result.TotalEventsProcessed` → `result.totaleventsprocessed`
 - `result.AverageLagMs` → `result.averagelagms`
 - `result.P95LagMs` → `result.p95lagms`
@@ -33,18 +36,21 @@ Changed all property accesses in `GetStatisticsAsync` to use lowercase:
 ### 2. **Milliseconds Calculation Order (Operator Precedence)**
 
 **Problem:**
+
 - Lag calculation was: `EXTRACT(EPOCH FROM (...))::INT * 1000`
 - Since `EXTRACT` returns seconds as decimal (e.g., 0.068), casting to INT first gives 0
 - Then `0 * 1000 = 0`
 - Result: All lag metrics were `0` instead of correct milliseconds
 
 **Incorrect:**
+
 ```sql
 total_lag_ms = EXTRACT(EPOCH FROM (@ProcessedAt - event_created_at))::INT * 1000
 -- 0.068 seconds → cast to INT = 0 → 0 * 1000 = 0
 ```
 
 **Correct:**
+
 ```sql
 total_lag_ms = (EXTRACT(EPOCH FROM (@ProcessedAt - event_created_at)) * 1000)::INT
 -- 0.068 seconds → 0.068 * 1000 = 68 → cast to INT = 68
@@ -57,6 +63,7 @@ total_lag_ms = (EXTRACT(EPOCH FROM (@ProcessedAt - event_created_at)) * 1000)::I
 ### 3. **Idempotent Event Creation Resets Processing State**
 
 **Problem:**
+
 - When processing the same event twice (for idempotency):
   1. First `ProcessEventAsync`: Creates lag record with status='CREATED', then updates to 'PROCESSED'
   2. Second `ProcessEventAsync`: Calls `RecordEventCreatedAsync` which has `ON CONFLICT (event_id) DO UPDATE SET status = 'CREATED'`
@@ -66,6 +73,7 @@ total_lag_ms = (EXTRACT(EPOCH FROM (@ProcessedAt - event_created_at)) * 1000)::I
 - Result: Idempotency test fails because metrics change on second processing
 
 **Issue Chain:**
+
 ```
 ProcessEventAsync call 1:
 ├─ RecordEventCreatedAsync: INSERT with status='CREATED'
@@ -80,6 +88,7 @@ ProcessEventAsync call 2:
 
 **Fix:**
 Changed `ON CONFLICT` to `DO NOTHING` instead of updating:
+
 ```sql
 ON CONFLICT (event_id) DO NOTHING
 ```
@@ -93,11 +102,13 @@ This makes `RecordEventCreatedAsync` completely idempotent - if the event alread
 ### 4. **Lag Metrics Update on Reprocessing**
 
 **Problem:**
+
 - Secondary processing of an event would recalculate `total_lag_ms` with the new timestamp
 - This violates idempotency: the same event processing should never change recorded metrics
 
 **Fix:**
 Added condition to UPDATE only if status != 'PROCESSED':
+
 ```sql
 UPDATE event_processing_lag
 SET total_lag_ms = ...
@@ -111,14 +122,16 @@ WHERE event_id = @EventId
 
 ## Test Results
 
-### Before Fixes:
+### Before Fixes
+
 - **64 passing, 1 failing** (LagStatistics_MultipleEvents_ComputedCorrectly)
 - Lag metrics returned 0 instead of actual values
 - Idempotency test failed due to metric changes
 
-### After Fixes:
+### After Fixes
+
 - **65/65 passing** ✅
-  - WaitingRoom.Tests.Application: 7/7  
+  - WaitingRoom.Tests.Application: 7/7
   - WaitingRoom.Tests.Domain: 39/39
   - WaitingRoom.Tests.Projections: 9/9
   - WaitingRoom.Tests.Integration: 10/10
@@ -162,6 +175,7 @@ Result: 65 passed, 0 failed
 ## Next Phase
 
 All core functionality is now working correctly. Recommend:
+
 - Monitoring event lag metrics in production
 - Adding alerting for high lag percentiles
 - Performance testing with realistic event volumes
