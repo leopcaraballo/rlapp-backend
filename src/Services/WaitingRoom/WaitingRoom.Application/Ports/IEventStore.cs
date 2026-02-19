@@ -54,4 +54,18 @@ public interface IEventStore
     Task<WaitingQueue?> LoadAsync(
         string aggregateId,
         CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Gets all events across all aggregates in deterministic order.
+    /// Used for projection rebuilds and event stream processing.
+    ///
+    /// Invariants:
+    /// - Events returned in ascending version order (global clock)
+    /// - Same call always returns events in same order
+    /// - Used for replay and deterministic projections
+    /// </summary>
+    /// <param name="cancellationToken">Cancellation token.</param>
+    /// <returns>All events in order by version.</returns>
+    Task<IEnumerable<DomainEvent>> GetAllEventsAsync(
+        CancellationToken cancellationToken = default);
 }

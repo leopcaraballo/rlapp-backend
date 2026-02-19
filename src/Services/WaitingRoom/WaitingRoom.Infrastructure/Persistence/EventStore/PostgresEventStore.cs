@@ -63,6 +63,21 @@ ORDER BY version;";
         return rows.Select(row => _serializer.Deserialize(row.EventName, row.Payload)).ToList();
     }
 
+    public async Task<IEnumerable<DomainEvent>> GetAllEventsAsync(
+        CancellationToken cancellationToken = default)
+    {
+        const string sql = @"
+SELECT event_name AS EventName, payload AS Payload
+FROM waiting_room_events
+ORDER BY version;";
+
+        await using var connection = new NpgsqlConnection(_connectionString);
+        var command = new CommandDefinition(sql, cancellationToken: cancellationToken);
+
+        var rows = await connection.QueryAsync<EventRow>(command);
+        return rows.Select(row => _serializer.Deserialize(row.EventName, row.Payload)).ToList();
+    }
+
     public async Task<WaitingQueue?> LoadAsync(
         string aggregateId,
         CancellationToken cancellationToken = default)

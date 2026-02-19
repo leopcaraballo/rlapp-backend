@@ -3,6 +3,7 @@
   <ItemGroup>
     <ProjectReference Include="..\WaitingRoom.Application\WaitingRoom.Application.csproj" />
     <ProjectReference Include="..\WaitingRoom.Domain\WaitingRoom.Domain.csproj" />
+    <ProjectReference Include="..\WaitingRoom.Projections\WaitingRoom.Projections.csproj" />
     <ProjectReference Include="..\..\..\BuildingBlocks\BuildingBlocks.EventSourcing\BuildingBlocks.EventSourcing.csproj" />
   </ItemGroup>
 
