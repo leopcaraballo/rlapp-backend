@@ -1,0 +1,11 @@
+/home/lcaraballo/Documentos/Sofka Projects/Projects/rlapp-backend/src/BuildingBlocks/BuildingBlocks.EventSourcing/bin/Release/net10.0/BuildingBlocks.EventSourcing.deps.json
+/home/lcaraballo/Documentos/Sofka Projects/Projects/rlapp-backend/src/BuildingBlocks/BuildingBlocks.EventSourcing/bin/Release/net10.0/BuildingBlocks.EventSourcing.dll
+/home/lcaraballo/Documentos/Sofka Projects/Projects/rlapp-backend/src/BuildingBlocks/BuildingBlocks.EventSourcing/bin/Release/net10.0/BuildingBlocks.EventSourcing.pdb
+/home/lcaraballo/Documentos/Sofka Projects/Projects/rlapp-backend/src/BuildingBlocks/BuildingBlocks.EventSourcing/obj/Release/net10.0/BuildingBlocks.EventSourcing.GeneratedMSBuildEditorConfig.editorconfig
+/home/lcaraballo/Documentos/Sofka Projects/Projects/rlapp-backend/src/BuildingBlocks/BuildingBlocks.EventSourcing/obj/Release/net10.0/BuildingBlocks.EventSourcing.AssemblyInfoInputs.cache
+/home/lcaraballo/Documentos/Sofka Projects/Projects/rlapp-backend/src/BuildingBlocks/BuildingBlocks.EventSourcing/obj/Release/net10.0/BuildingBlocks.EventSourcing.AssemblyInfo.cs
+/home/lcaraballo/Documentos/Sofka Projects/Projects/rlapp-backend/src/BuildingBlocks/BuildingBlocks.EventSourcing/obj/Release/net10.0/BuildingBlocks.EventSourcing.csproj.CoreCompileInputs.cache
+/home/lcaraballo/Documentos/Sofka Projects/Projects/rlapp-backend/src/BuildingBlocks/BuildingBlocks.EventSourcing/obj/Release/net10.0/BuildingBlocks.EventSourcing.dll
+/home/lcaraballo/Documentos/Sofka Projects/Projects/rlapp-backend/src/BuildingBlocks/BuildingBlocks.EventSourcing/obj/Release/net10.0/refint/BuildingBlocks.EventSourcing.dll
+/home/lcaraballo/Documentos/Sofka Projects/Projects/rlapp-backend/src/BuildingBlocks/BuildingBlocks.EventSourcing/obj/Release/net10.0/BuildingBlocks.EventSourcing.pdb
+/home/lcaraballo/Documentos/Sofka Projects/Projects/rlapp-backend/src/BuildingBlocks/BuildingBlocks.EventSourcing/obj/Release/net10.0/ref/BuildingBlocks.EventSourcing.dll

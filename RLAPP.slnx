@@ -7,6 +7,7 @@
   <Folder Name="/src/Services/WaitingRoom/">
     <Project Path="src/Services/WaitingRoom/WaitingRoom.Domain/WaitingRoom.Domain.csproj" />
     <Project Path="src/Services/WaitingRoom/WaitingRoom.Application/WaitingRoom.Application.csproj" />
+    <Project Path="src/Services/WaitingRoom/WaitingRoom.Infrastructure/WaitingRoom.Infrastructure.csproj" />
   </Folder>
   <Folder Name="/src/Tests/">
     <Project Path="src/Tests/WaitingRoom.Tests.Domain/WaitingRoom.Tests.Domain.csproj" />

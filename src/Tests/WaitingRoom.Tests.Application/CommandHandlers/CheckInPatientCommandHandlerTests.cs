@@ -11,6 +11,7 @@ using WaitingRoom.Domain.ValueObjects;
 using WaitingRoom.Domain.Exceptions;
 using WaitingRoom.Domain.Events;
 using BuildingBlocks.EventSourcing;
+using WaitingRoom.Tests.Application.Fakes;
 
 /// <summary>
 /// Tests for CheckInPatientCommandHandler.
@@ -58,7 +59,8 @@ public class CheckInPatientCommandHandlerTests
             .Setup(es => es.LoadAsync(queueId, It.IsAny<CancellationToken>()))
             .ReturnsAsync(queue);
 
-        var handler = new CheckInPatientCommandHandler(eventStoreMock.Object, publisherMock.Object);
+        var clock = new FakeClock();
+        var handler = new CheckInPatientCommandHandler(eventStoreMock.Object, publisherMock.Object, clock);
 
         // ACT
         var result = await handler.HandleAsync(command);
@@ -104,7 +106,8 @@ public class CheckInPatientCommandHandlerTests
             .Setup(es => es.LoadAsync(queueId, It.IsAny<CancellationToken>()))
             .ReturnsAsync((WaitingQueue?)null);
 
-        var handler = new CheckInPatientCommandHandler(eventStoreMock.Object, publisherMock.Object);
+        var clock = new FakeClock();
+        var handler = new CheckInPatientCommandHandler(eventStoreMock.Object, publisherMock.Object, clock);
 
         // ACT & ASSERT
         var exception = await Assert.ThrowsAsync<AggregateNotFoundException>(
@@ -151,7 +154,8 @@ public class CheckInPatientCommandHandlerTests
             .Setup(es => es.LoadAsync(queueId, It.IsAny<CancellationToken>()))
             .ReturnsAsync(queue);
 
-        var handler = new CheckInPatientCommandHandler(eventStoreMock.Object, publisherMock.Object);
+        var clock = new FakeClock();
+        var handler = new CheckInPatientCommandHandler(eventStoreMock.Object, publisherMock.Object, clock);
 
         // ACT & ASSERT
         // Domain should throw because queue is at capacity
@@ -194,7 +198,8 @@ public class CheckInPatientCommandHandlerTests
             .Setup(es => es.SaveAsync(It.IsAny<WaitingQueue>(), It.IsAny<CancellationToken>()))
             .ThrowsAsync(new EventConflictException(queueId, expectedVersion: 1, actualVersion: 2));
 
-        var handler = new CheckInPatientCommandHandler(eventStoreMock.Object, publisherMock.Object);
+        var clock = new FakeClock();
+        var handler = new CheckInPatientCommandHandler(eventStoreMock.Object, publisherMock.Object, clock);
 
         // ACT & ASSERT
         var exception = await Assert.ThrowsAsync<EventConflictException>(
@@ -240,7 +245,8 @@ public class CheckInPatientCommandHandlerTests
             .Setup(es => es.SaveAsync(It.IsAny<WaitingQueue>(), It.IsAny<CancellationToken>()))
             .Callback<WaitingQueue, CancellationToken>((q, _) => savedQueue = q);
 
-        var handler = new CheckInPatientCommandHandler(eventStoreMock.Object, publisherMock.Object);
+        var clock = new FakeClock();
+        var handler = new CheckInPatientCommandHandler(eventStoreMock.Object, publisherMock.Object, clock);
 
         // ACT
         var result = await handler.HandleAsync(command);
@@ -249,7 +255,7 @@ public class CheckInPatientCommandHandlerTests
         // IdempotencyKey must be preserved in event metadata for infrastructure to detect duplicates
         result.Should().BeGreaterThan(0);
         savedQueue.Should().NotBeNull();
-        
+
         // Events should have the idempotency key in the causation ID
         // so infrastructure can detect and deduplicate duplicate commands
         savedQueue.UncommittedEvents.Should().AllSatisfy(e =>
@@ -292,7 +298,8 @@ public class CheckInPatientCommandHandlerTests
             .Setup(es => es.SaveAsync(It.IsAny<WaitingQueue>(), It.IsAny<CancellationToken>()))
             .Callback<WaitingQueue, CancellationToken>((agg, _) => savedAggregate = agg);
 
-        var handler = new CheckInPatientCommandHandler(eventStoreMock.Object, publisherMock.Object);
+        var clock = new FakeClock();
+        var handler = new CheckInPatientCommandHandler(eventStoreMock.Object, publisherMock.Object, clock);
 
         // ACT
         await handler.HandleAsync(command);
@@ -338,7 +345,8 @@ public class CheckInPatientCommandHandlerTests
             .Setup(pub => pub.PublishAsync(It.IsAny<IEnumerable<DomainEvent>>(), It.IsAny<CancellationToken>()))
             .Callback<IEnumerable<DomainEvent>, CancellationToken>((events, _) => publishedEvents = events);
 
-        var handler = new CheckInPatientCommandHandler(eventStoreMock.Object, publisherMock.Object);
+        var clock = new FakeClock();
+        var handler = new CheckInPatientCommandHandler(eventStoreMock.Object, publisherMock.Object, clock);
 
         // ACT
         await handler.HandleAsync(command);

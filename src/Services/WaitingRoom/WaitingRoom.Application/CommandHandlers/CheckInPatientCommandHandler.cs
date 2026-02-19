@@ -26,13 +26,16 @@ public sealed class CheckInPatientCommandHandler
 {
     private readonly IEventStore _eventStore;
     private readonly IEventPublisher _eventPublisher;
+    private readonly IClock _clock;
 
     public CheckInPatientCommandHandler(
         IEventStore eventStore,
-        IEventPublisher eventPublisher)
+        IEventPublisher eventPublisher,
+        IClock clock)
     {
         _eventStore = eventStore ?? throw new ArgumentNullException(nameof(eventStore));
         _eventPublisher = eventPublisher ?? throw new ArgumentNullException(nameof(eventPublisher));
+        _clock = clock ?? throw new ArgumentNullException(nameof(clock));
     }
 
     /// <summary>
@@ -80,7 +83,7 @@ public sealed class CheckInPatientCommandHandler
             patientName: command.PatientName,
             priority: priority,
             consultationType: consultationType,
-            checkInTime: DateTime.UtcNow,
+            checkInTime: _clock.UtcNow,
             metadata: metadata,
             notes: command.Notes);
 
