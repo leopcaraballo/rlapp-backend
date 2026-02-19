@@ -1,0 +1,29 @@
+apiVersion: 1
+
+datasources:
+  - name: Prometheus
+    type: prometheus
+    url: http://prometheus:9090
+    access: proxy
+    isDefault: true
+    editable: true
+    jsonData:
+      timeInterval: 15s
+
+  - name: PostgreSQL
+    type: postgres
+    url: postgres:5432
+    database: waitingroom_read_models
+    user: rlapp
+    secureJsonData:
+      password: rlapp_secure_password
+    jsonData:
+      sslMode: disable
+      postgresVersion: 1600
+    editable: true
+
+  - name: Seq
+    type: noop
+    url: http://seq:80
+    access: proxy
+    editable: true

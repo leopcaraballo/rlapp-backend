@@ -1,0 +1,122 @@
+# =============================================================================
+# Prometheus Alert Rules
+# Event Processing & Infrastructure Monitoring
+# =============================================================================
+
+groups:
+  - name: rlapp_event_processing
+    interval: 30s
+    rules:
+      # Alert if events are lagging significantly
+      - alert: HighEventProcessingLag
+        expr: |
+          (time() - (event_processing_lag_ms offset 5m)) > 60000
+        for: 5m
+        labels:
+          severity: warning
+          component: event_system
+        annotations:
+          summary: "High event processing lag detected"
+          description: "Events are delayed by more than 1 minute (current: {{ $value }}ms)"
+
+      # Alert if outbox worker is behind
+      - alert: OutboxWorkerBehind
+        expr: |
+          (outbox_pending_count) > 1000
+        for: 10m
+        labels:
+          severity: critical
+          component: outbox_worker
+        annotations:
+          summary: "Outbox worker is significantly behind"
+          description: "{{ $value }} events pending dispatch from outbox"
+
+      # Alert if projections are stale
+      - alert: ProjectionCheckpointStale
+        expr: |
+          (time() - projection_last_processed_timestamp) > 300
+        for: 5m
+        labels:
+          severity: warning
+          component: projections
+        annotations:
+          summary: "Projection processing checkpoint is stale"
+          description: "{{ $labels.projection_id }} hasn't processed events for > 5 minutes"
+
+  - name: rlapp_infrastructure
+    interval: 30s
+    rules:
+      # PostgreSQL connection pool saturation
+      - alert: PostgresConnectionPoolSaturation
+        expr: |
+          (pg_stat_activity_count / 200) > 0.8
+        for: 5m
+        labels:
+          severity: warning
+          component: postgres
+        annotations:
+          summary: "PostgreSQL connection pool approaching saturation"
+          description: "Connection utilization: {{ $value | humanizePercentage }}"
+
+      # RabbitMQ disk alarm
+      - alert: RabbitMQDiskAlarm
+        expr: |
+          rabbitmq_alarms_disk_alarm == 1
+        for: 1m
+        labels:
+          severity: critical
+          component: rabbitmq
+        annotations:
+          summary: "RabbitMQ disk alarm triggered"
+          description: "RabbitMQ has triggered disk alarm - check free disk space"
+
+      # RabbitMQ memory alarm
+      - alert: RabbitMQMemoryAlarm
+        expr: |
+          rabbitmq_alarms_memory_alarm == 1
+        for: 1m
+        labels:
+          severity: critical
+          component: rabbitmq
+        annotations:
+          summary: "RabbitMQ memory alarm triggered"
+          description: "RabbitMQ has triggered memory alarm - check memory usage"
+
+      # Queue buildup
+      - alert: MessageQueueBuildup
+        expr: |
+          increase(rabbitmq_queue_messages[5m]) > 1000
+        for: 10m
+        labels:
+          severity: warning
+          component: rabbitmq
+        annotations:
+          summary: "Messages accumulating in queue"
+          description: "Queue {{ $labels.queue }} has significant message buildup"
+
+  - name: rlapp_application
+    interval: 30s
+    rules:
+      # High error rate
+      - alert: HighErrorRate
+        expr: |
+          (rate(http_requests_total{status=~"5.."}[5m]) / rate(http_requests_total[5m])) > 0.05
+        for: 5m
+        labels:
+          severity: warning
+          component: api
+        annotations:
+          summary: "High error rate in API"
+          description: "Error rate above 5% (current: {{ $value | humanizePercentage }})"
+
+      # P95 response time degradation
+      - alert: SlowResponseTime
+        expr: |
+          histogram_quantile(0.95, rate(http_request_duration_seconds_bucket[5m])) > 1
+        for: 5m
+        labels:
+          severity: warning
+          component: api
+        annotations:
+          summary: "P95 response time exceeds 1s"
+          description: "P95 response time: {{ $value }}s"

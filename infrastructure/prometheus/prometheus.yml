@@ -1,0 +1,62 @@
+# =============================================================================
+# Prometheus Configuration
+# Metrics scraping for RLAPP Event-Driven Architecture
+# =============================================================================
+
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+  external_labels:
+    cluster: "rlapp"
+    environment: "docker"
+
+# Alertmanager config (optional)
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets: []
+
+# Load rules once and periodically evaluate them
+rule_files:
+  - "/etc/prometheus/alert-rules.yml"
+
+scrape_configs:
+  # Prometheus self-monitoring
+  - job_name: "prometheus"
+    static_configs:
+      - targets: ["localhost:9090"]
+
+  # PostgreSQL Exporter
+  - job_name: "postgres"
+    static_configs:
+      - targets: ["postgres_exporter:9187"]
+    metric_relabel_configs:
+      - source_labels: [__name__]
+        regex: "pg_.*"
+        action: keep
+
+  # RabbitMQ Exporter
+  - job_name: "rabbitmq"
+    static_configs:
+      - targets: ["rabbitmq:15672"]
+    metrics_path: "/api/metrics"
+    params:
+      family: ["queue_coarse_metrics", "exchange_throughput_metrics"]
+    basic_auth:
+      username: "guest"
+      password: "guest"
+
+  # Custom application metrics (when implemented)
+  - job_name: "rlapp-api"
+    metrics_path: "/metrics"
+    static_configs:
+      - targets: ["localhost:8081"]
+    scrape_interval: 5s
+    scrape_timeout: 5s
+
+  # Event lag metrics (custom endpoint)
+  - job_name: "event-lag-metrics"
+    metrics_path: "/metrics/lag"
+    static_configs:
+      - targets: ["localhost:8081"]
+    scrape_interval: 10s

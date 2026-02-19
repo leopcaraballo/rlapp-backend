@@ -1,0 +1,34 @@
+# Build artifacts
+bin/
+obj/
+*.exe
+*.dll
+*.pdb
+*.nupkg
+
+# Visual Studio
+.vs/
+.vscode/
+*.user
+*.userprefs
+*.sln.iml
+
+# Dependencies
+packages/
+node_modules/
+
+# IDE
+.idea/
+*.swp
+*.swo
+
+# Environment
+.env
+.env.local
+
+# Docker
+.dockerignore
+
+# OS
+.DS_Store
+Thumbs.db
