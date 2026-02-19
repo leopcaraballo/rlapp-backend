@@ -1,0 +1,15 @@
+<Solution>
+  <Folder Name="/src/" />
+  <Folder Name="/src/BuildingBlocks/">
+    <Project Path="src/BuildingBlocks/BuildingBlocks.EventSourcing/BuildingBlocks.EventSourcing.csproj" />
+  </Folder>
+  <Folder Name="/src/Services/" />
+  <Folder Name="/src/Services/WaitingRoom/">
+    <Project Path="src/Services/WaitingRoom/WaitingRoom.Domain/WaitingRoom.Domain.csproj" />
+    <Project Path="src/Services/WaitingRoom/WaitingRoom.Application/WaitingRoom.Application.csproj" />
+  </Folder>
+  <Folder Name="/src/Tests/">
+    <Project Path="src/Tests/WaitingRoom.Tests.Domain/WaitingRoom.Tests.Domain.csproj" />
+    <Project Path="src/Tests/WaitingRoom.Tests.Application/WaitingRoom.Tests.Application.csproj" />
+  </Folder>
+</Solution>
