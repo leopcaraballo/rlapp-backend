@@ -15,13 +15,13 @@ internal sealed class PostgresEventStore : IEventStore
 {
     private readonly string _connectionString;
     private readonly EventSerializer _serializer;
-    private readonly PostgresOutboxStore _outboxStore;
+    private readonly IOutboxStore _outboxStore;  // ← Now depends on interface, not concrete class
     private readonly IEventLagTracker? _lagTracker;
 
     public PostgresEventStore(
         string connectionString,
         EventSerializer serializer,
-        PostgresOutboxStore outboxStore,
+        IOutboxStore outboxStore,  // ← Interface, not PostgresOutboxStore!
         IEventLagTracker? lagTracker = null)
     {
         if (string.IsNullOrWhiteSpace(connectionString))

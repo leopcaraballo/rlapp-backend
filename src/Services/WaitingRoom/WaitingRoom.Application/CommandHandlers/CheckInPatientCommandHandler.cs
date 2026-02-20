@@ -5,6 +5,7 @@ using WaitingRoom.Application.Commands;
 using WaitingRoom.Application.Exceptions;
 using WaitingRoom.Application.Ports;
 using WaitingRoom.Domain.Aggregates;
+using WaitingRoom.Domain.Commands;
 using WaitingRoom.Domain.ValueObjects;
 
 /// <summary>
@@ -69,23 +70,27 @@ public sealed class CheckInPatientCommandHandler
         // The aggregate applies all business rules to verify check-in is valid
         // If invalid, it throws DomainException
         // If valid, it generates PatientCheckedIn event and applies it to state
+
+        // Build metadata once
         var metadata = EventMetadata.CreateNew(
             aggregateId: command.QueueId,
             actor: command.Actor,
             correlationId: command.CorrelationId ?? Guid.NewGuid().ToString());
 
-        var patientId = PatientId.Create(command.PatientId);
-        var priority = Priority.Create(command.Priority);
-        var consultationType = ConsultationType.Create(command.ConsultationType);
+        // Create request object (Parameter Object pattern, eliminates 7-parameter method)
+        var request = new CheckInPatientRequest
+        {
+            PatientId = PatientId.Create(command.PatientId),
+            PatientName = command.PatientName,
+            Priority = Priority.Create(command.Priority),
+            ConsultationType = ConsultationType.Create(command.ConsultationType),
+            CheckInTime = _clock.UtcNow,
+            Metadata = metadata,
+            Notes = command.Notes
+        };
 
-        queue.CheckInPatient(
-            patientId: patientId,
-            patientName: command.PatientName,
-            priority: priority,
-            consultationType: consultationType,
-            checkInTime: _clock.UtcNow,
-            metadata: metadata,
-            notes: command.Notes);
+        // Execute domain operation with single parameter
+        queue.CheckInPatient(request);
 
         // STEP 3: Persist events atomically
         // All new events (in UncommittedEvents) are saved in single transaction

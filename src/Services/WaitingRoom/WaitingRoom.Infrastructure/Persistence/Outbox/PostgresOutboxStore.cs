@@ -3,6 +3,7 @@ namespace WaitingRoom.Infrastructure.Persistence.Outbox;
 using System.Data;
 using Dapper;
 using Npgsql;
+using WaitingRoom.Application.Ports;
 using WaitingRoom.Infrastructure.Persistence.EventStore;
 
 internal sealed class PostgresOutboxStore : IOutboxStore
@@ -27,7 +28,7 @@ internal sealed class PostgresOutboxStore : IOutboxStore
     }
 
     public async Task AddAsync(
-        IEnumerable<OutboxMessage> messages,
+        List<OutboxMessage> messages,
         IDbConnection connection,
         IDbTransaction transaction,
         CancellationToken cancellationToken = default)

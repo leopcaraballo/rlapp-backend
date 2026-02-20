@@ -1,6 +1,7 @@
 namespace WaitingRoom.Domain.Aggregates;
 
 using BuildingBlocks.EventSourcing;
+using WaitingRoom.Domain.Commands;
 using WaitingRoom.Domain.Events;
 using WaitingRoom.Domain.ValueObjects;
 using WaitingRoom.Domain.Entities;
@@ -89,6 +90,9 @@ public sealed class WaitingQueue : AggregateRoot
     /// <summary>
     /// Core use case: Patient checks into waiting room.
     ///
+    /// Refactored to use Parameter Object pattern.
+    /// This eliminates parameter cascading (was 7 params, now 1).
+    ///
     /// Business logic:
     /// 1. Validate queue hasn't reached capacity
     /// 2. Validate patient isn't already checked in
@@ -96,20 +100,21 @@ public sealed class WaitingQueue : AggregateRoot
     /// 4. Assign position based on priority
     /// 5. Emit PatientCheckedIn event
     /// 6. Apply event to state (idempotent)
+    ///
+    /// Pattern: Command Object / Parameter Object
+    /// Benefit: Extensible without breaking existing signatures
     /// </summary>
-    public void CheckInPatient(
-        PatientId patientId,
-        string patientName,
-        Priority priority,
-        ConsultationType consultationType,
-        DateTime checkInTime,
-        EventMetadata metadata,
-        string? notes = null)
+    /// <param name="request">Complete check-in request encapsulating all parameters.</param>
+    /// <exception cref="DomainException">If any invariant violated.</exception>
+    public void CheckInPatient(CheckInPatientRequest request)
     {
+        if (request is null)
+            throw new ArgumentNullException(nameof(request));
+
         // Validate invariants
         WaitingQueueInvariants.ValidateCapacity(Patients.Count, MaxCapacity);
-        WaitingQueueInvariants.ValidateDuplicateCheckIn(patientId.Value, Patients.Select(p => p.PatientId.Value));
-        WaitingQueueInvariants.ValidatePriority(priority.Value);
+        WaitingQueueInvariants.ValidateDuplicateCheckIn(request.PatientId.Value, Patients.Select(p => p.PatientId.Value));
+        WaitingQueueInvariants.ValidatePriority(request.Priority.Value);
 
         // Calculate queue position (could be priority-based in future)
         int queuePosition = Patients.Count;
@@ -117,15 +122,15 @@ public sealed class WaitingQueue : AggregateRoot
         // Create and raise event
         var @event = new PatientCheckedIn
         {
-            Metadata = metadata.WithVersion(Version + 1),
+            Metadata = request.Metadata.WithVersion(Version + 1),
             QueueId = Id,
-            PatientId = patientId.Value,
-            PatientName = patientName,
-            Priority = priority.Value,
-            ConsultationType = consultationType.Value,
-            CheckInTime = checkInTime,
+            PatientId = request.PatientId.Value,
+            PatientName = request.PatientName,
+            Priority = request.Priority.Value,
+            ConsultationType = request.ConsultationType.Value,
+            CheckInTime = request.CheckInTime,
             QueuePosition = queuePosition,
-            Notes = notes
+            Notes = request.Notes
         };
 
         RaiseEvent(@event);

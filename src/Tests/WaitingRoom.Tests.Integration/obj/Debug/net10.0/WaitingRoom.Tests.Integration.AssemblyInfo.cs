@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("WaitingRoom.Tests.Integration")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+2d6b40daa471038e2fc852e8c684ba0bfa5ee1d7")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+92810154be3670d2e6148621c80d61a1393863d5")]
 [assembly: System.Reflection.AssemblyProductAttribute("WaitingRoom.Tests.Integration")]
 [assembly: System.Reflection.AssemblyTitleAttribute("WaitingRoom.Tests.Integration")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
