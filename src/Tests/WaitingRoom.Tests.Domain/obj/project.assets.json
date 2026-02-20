@@ -992,11 +992,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "/home/lcaraballo/Documentos/Sofka Projects/Projects/rlapp-backend/src/Tests/WaitingRoom.Tests.Domain/WaitingRoom.Tests.Domain.csproj",
+      "projectUniqueName": "/home/lcaraballo/Documentos/Sofka Projects/Projects/rlapp/rlapp-backend/src/Tests/WaitingRoom.Tests.Domain/WaitingRoom.Tests.Domain.csproj",
       "projectName": "WaitingRoom.Tests.Domain",
-      "projectPath": "/home/lcaraballo/Documentos/Sofka Projects/Projects/rlapp-backend/src/Tests/WaitingRoom.Tests.Domain/WaitingRoom.Tests.Domain.csproj",
+      "projectPath": "/home/lcaraballo/Documentos/Sofka Projects/Projects/rlapp/rlapp-backend/src/Tests/WaitingRoom.Tests.Domain/WaitingRoom.Tests.Domain.csproj",
       "packagesPath": "/home/lcaraballo/.nuget/packages/",
-      "outputPath": "/home/lcaraballo/Documentos/Sofka Projects/Projects/rlapp-backend/src/Tests/WaitingRoom.Tests.Domain/obj/",
+      "outputPath": "/home/lcaraballo/Documentos/Sofka Projects/Projects/rlapp/rlapp-backend/src/Tests/WaitingRoom.Tests.Domain/obj/",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "/home/lcaraballo/.nuget/NuGet/NuGet.Config"
@@ -1012,8 +1012,8 @@
         "net10.0": {
           "targetAlias": "net10.0",
           "projectReferences": {
-            "/home/lcaraballo/Documentos/Sofka Projects/Projects/rlapp-backend/src/Services/WaitingRoom/WaitingRoom.Domain/WaitingRoom.Domain.csproj": {
-              "projectPath": "/home/lcaraballo/Documentos/Sofka Projects/Projects/rlapp-backend/src/Services/WaitingRoom/WaitingRoom.Domain/WaitingRoom.Domain.csproj"
+            "/home/lcaraballo/Documentos/Sofka Projects/Projects/rlapp/rlapp-backend/src/Services/WaitingRoom/WaitingRoom.Domain/WaitingRoom.Domain.csproj": {
+              "projectPath": "/home/lcaraballo/Documentos/Sofka Projects/Projects/rlapp/rlapp-backend/src/Services/WaitingRoom/WaitingRoom.Domain/WaitingRoom.Domain.csproj"
             }
           }
         }

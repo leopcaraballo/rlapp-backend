@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "VJZRJNKShSM=",
+  "dgSpecHash": "mP41bb0zjqQ=",
   "success": true,
-  "projectFilePath": "/home/lcaraballo/Documentos/Sofka Projects/Projects/rlapp-backend/src/BuildingBlocks/BuildingBlocks.EventSourcing/BuildingBlocks.EventSourcing.csproj",
+  "projectFilePath": "/home/lcaraballo/Documentos/Sofka Projects/Projects/rlapp/rlapp-backend/src/BuildingBlocks/BuildingBlocks.EventSourcing/BuildingBlocks.EventSourcing.csproj",
   "expectedPackageFiles": [],
   "logs": []
 }

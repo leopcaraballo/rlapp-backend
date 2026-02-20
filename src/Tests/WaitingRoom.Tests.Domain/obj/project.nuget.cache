@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "OhTRLA8AbF8=",
+  "dgSpecHash": "oqUKiRjSuW4=",
   "success": true,
-  "projectFilePath": "/home/lcaraballo/Documentos/Sofka Projects/Projects/rlapp-backend/src/Tests/WaitingRoom.Tests.Domain/WaitingRoom.Tests.Domain.csproj",
+  "projectFilePath": "/home/lcaraballo/Documentos/Sofka Projects/Projects/rlapp/rlapp-backend/src/Tests/WaitingRoom.Tests.Domain/WaitingRoom.Tests.Domain.csproj",
   "expectedPackageFiles": [
     "/home/lcaraballo/.nuget/packages/coverlet.collector/6.0.4/coverlet.collector.6.0.4.nupkg.sha512",
     "/home/lcaraballo/.nuget/packages/fluentassertions/8.8.0/fluentassertions.8.8.0.nupkg.sha512",

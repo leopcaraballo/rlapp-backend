@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "GJDEW3ogyag=",
+  "dgSpecHash": "FMxTaZVvEuY=",
   "success": true,
-  "projectFilePath": "/home/lcaraballo/Documentos/Sofka Projects/Projects/rlapp-backend/src/Services/WaitingRoom/WaitingRoom.Domain/WaitingRoom.Domain.csproj",
+  "projectFilePath": "/home/lcaraballo/Documentos/Sofka Projects/Projects/rlapp/rlapp-backend/src/Services/WaitingRoom/WaitingRoom.Domain/WaitingRoom.Domain.csproj",
   "expectedPackageFiles": [],
   "logs": []
 }

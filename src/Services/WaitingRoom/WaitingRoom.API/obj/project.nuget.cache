@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "FSZBkZIVepE=",
+  "dgSpecHash": "66SecJ+ckkc=",
   "success": true,
-  "projectFilePath": "/home/lcaraballo/Documentos/Sofka Projects/Projects/rlapp-backend/src/Services/WaitingRoom/WaitingRoom.API/WaitingRoom.API.csproj",
+  "projectFilePath": "/home/lcaraballo/Documentos/Sofka Projects/Projects/rlapp/rlapp-backend/src/Services/WaitingRoom/WaitingRoom.API/WaitingRoom.API.csproj",
   "expectedPackageFiles": [
     "/home/lcaraballo/.nuget/packages/aspnetcore.healthchecks.npgsql/9.0.0/aspnetcore.healthchecks.npgsql.9.0.0.nupkg.sha512",
     "/home/lcaraballo/.nuget/packages/dapper/2.1.35/dapper.2.1.35.nupkg.sha512",

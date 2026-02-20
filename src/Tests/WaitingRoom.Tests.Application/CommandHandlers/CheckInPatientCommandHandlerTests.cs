@@ -1,5 +1,6 @@
 namespace WaitingRoom.Tests.Application.CommandHandlers;
 
+using BuildingBlocks.EventSourcing;
 using FluentAssertions;
 using Moq;
 using WaitingRoom.Application.CommandHandlers;
@@ -11,7 +12,6 @@ using WaitingRoom.Domain.Commands;
 using WaitingRoom.Domain.ValueObjects;
 using WaitingRoom.Domain.Exceptions;
 using WaitingRoom.Domain.Events;
-using BuildingBlocks.EventSourcing;
 using WaitingRoom.Tests.Application.Fakes;
 
 /// <summary>
@@ -83,10 +83,11 @@ public class CheckInPatientCommandHandlerTests
     }
 
     /// <summary>
-    /// Error scenario: Queue not found
+    /// Business scenario: Queue not found
+    /// The handler must bootstrap the queue and process check-in.
     /// </summary>
     [Fact]
-    public async Task HandleAsync_QueueNotFound_ThrowsAggregateNotFoundException()
+    public async Task HandleAsync_QueueNotFound_BootstrapsQueueAndProcessesCheckIn()
     {
         // ARRANGE
         var queueId = "QUEUE-NOTFOUND";
@@ -111,11 +112,19 @@ public class CheckInPatientCommandHandlerTests
         var clock = new FakeClock();
         var handler = new CheckInPatientCommandHandler(eventStoreMock.Object, publisherMock.Object, clock);
 
-        // ACT & ASSERT
-        var exception = await Assert.ThrowsAsync<AggregateNotFoundException>(
-            () => handler.HandleAsync(command));
+        // ACT
+        var result = await handler.HandleAsync(command);
 
-        exception.AggregateId.Should().Be(queueId);
+        // ASSERT
+        result.Should().BeGreaterThan(0);
+
+        eventStoreMock.Verify(
+            es => es.SaveAsync(It.IsAny<WaitingQueue>(), It.IsAny<CancellationToken>()),
+            Times.Once);
+
+        publisherMock.Verify(
+            pub => pub.PublishAsync(It.IsAny<IEnumerable<DomainEvent>>(), It.IsAny<CancellationToken>()),
+            Times.Once);
     }
 
     /// <summary>

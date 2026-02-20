@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "/home/lcaraballo/Documentos/Sofka Projects/Projects/rlapp-backend/src/Services/WaitingRoom/WaitingRoom.Worker/WaitingRoom.Worker.csproj": {}
+    "/home/lcaraballo/Documentos/Sofka Projects/Projects/rlapp/rlapp-backend/src/Services/WaitingRoom/WaitingRoom.Worker/WaitingRoom.Worker.csproj": {}
   },
   "projects": {
-    "/home/lcaraballo/Documentos/Sofka Projects/Projects/rlapp-backend/src/BuildingBlocks/BuildingBlocks.EventSourcing/BuildingBlocks.EventSourcing.csproj": {
+    "/home/lcaraballo/Documentos/Sofka Projects/Projects/rlapp/rlapp-backend/src/BuildingBlocks/BuildingBlocks.EventSourcing/BuildingBlocks.EventSourcing.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/home/lcaraballo/Documentos/Sofka Projects/Projects/rlapp-backend/src/BuildingBlocks/BuildingBlocks.EventSourcing/BuildingBlocks.EventSourcing.csproj",
+        "projectUniqueName": "/home/lcaraballo/Documentos/Sofka Projects/Projects/rlapp/rlapp-backend/src/BuildingBlocks/BuildingBlocks.EventSourcing/BuildingBlocks.EventSourcing.csproj",
         "projectName": "BuildingBlocks.EventSourcing",
-        "projectPath": "/home/lcaraballo/Documentos/Sofka Projects/Projects/rlapp-backend/src/BuildingBlocks/BuildingBlocks.EventSourcing/BuildingBlocks.EventSourcing.csproj",
+        "projectPath": "/home/lcaraballo/Documentos/Sofka Projects/Projects/rlapp/rlapp-backend/src/BuildingBlocks/BuildingBlocks.EventSourcing/BuildingBlocks.EventSourcing.csproj",
         "packagesPath": "/home/lcaraballo/.nuget/packages/",
-        "outputPath": "/home/lcaraballo/Documentos/Sofka Projects/Projects/rlapp-backend/src/BuildingBlocks/BuildingBlocks.EventSourcing/obj/",
+        "outputPath": "/home/lcaraballo/Documentos/Sofka Projects/Projects/rlapp/rlapp-backend/src/BuildingBlocks/BuildingBlocks.EventSourcing/obj/",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "/home/lcaraballo/.nuget/NuGet/NuGet.Config"
@@ -338,14 +338,14 @@
         }
       }
     },
-    "/home/lcaraballo/Documentos/Sofka Projects/Projects/rlapp-backend/src/BuildingBlocks/BuildingBlocks.Messaging/BuildingBlocks.Messaging.csproj": {
+    "/home/lcaraballo/Documentos/Sofka Projects/Projects/rlapp/rlapp-backend/src/BuildingBlocks/BuildingBlocks.Messaging/BuildingBlocks.Messaging.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/home/lcaraballo/Documentos/Sofka Projects/Projects/rlapp-backend/src/BuildingBlocks/BuildingBlocks.Messaging/BuildingBlocks.Messaging.csproj",
+        "projectUniqueName": "/home/lcaraballo/Documentos/Sofka Projects/Projects/rlapp/rlapp-backend/src/BuildingBlocks/BuildingBlocks.Messaging/BuildingBlocks.Messaging.csproj",
         "projectName": "BuildingBlocks.Messaging",
-        "projectPath": "/home/lcaraballo/Documentos/Sofka Projects/Projects/rlapp-backend/src/BuildingBlocks/BuildingBlocks.Messaging/BuildingBlocks.Messaging.csproj",
+        "projectPath": "/home/lcaraballo/Documentos/Sofka Projects/Projects/rlapp/rlapp-backend/src/BuildingBlocks/BuildingBlocks.Messaging/BuildingBlocks.Messaging.csproj",
         "packagesPath": "/home/lcaraballo/.nuget/packages/",
-        "outputPath": "/home/lcaraballo/Documentos/Sofka Projects/Projects/rlapp-backend/src/BuildingBlocks/BuildingBlocks.Messaging/obj/",
+        "outputPath": "/home/lcaraballo/Documentos/Sofka Projects/Projects/rlapp/rlapp-backend/src/BuildingBlocks/BuildingBlocks.Messaging/obj/",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "/home/lcaraballo/.nuget/NuGet/NuGet.Config"
@@ -361,8 +361,8 @@
           "net10.0": {
             "targetAlias": "net10.0",
             "projectReferences": {
-              "/home/lcaraballo/Documentos/Sofka Projects/Projects/rlapp-backend/src/BuildingBlocks/BuildingBlocks.EventSourcing/BuildingBlocks.EventSourcing.csproj": {
-                "projectPath": "/home/lcaraballo/Documentos/Sofka Projects/Projects/rlapp-backend/src/BuildingBlocks/BuildingBlocks.EventSourcing/BuildingBlocks.EventSourcing.csproj"
+              "/home/lcaraballo/Documentos/Sofka Projects/Projects/rlapp/rlapp-backend/src/BuildingBlocks/BuildingBlocks.EventSourcing/BuildingBlocks.EventSourcing.csproj": {
+                "projectPath": "/home/lcaraballo/Documentos/Sofka Projects/Projects/rlapp/rlapp-backend/src/BuildingBlocks/BuildingBlocks.EventSourcing/BuildingBlocks.EventSourcing.csproj"
               }
             }
           }
@@ -676,14 +676,14 @@
         }
       }
     },
-    "/home/lcaraballo/Documentos/Sofka Projects/Projects/rlapp-backend/src/BuildingBlocks/BuildingBlocks.Observability/BuildingBlocks.Observability.csproj": {
+    "/home/lcaraballo/Documentos/Sofka Projects/Projects/rlapp/rlapp-backend/src/BuildingBlocks/BuildingBlocks.Observability/BuildingBlocks.Observability.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/home/lcaraballo/Documentos/Sofka Projects/Projects/rlapp-backend/src/BuildingBlocks/BuildingBlocks.Observability/BuildingBlocks.Observability.csproj",
+        "projectUniqueName": "/home/lcaraballo/Documentos/Sofka Projects/Projects/rlapp/rlapp-backend/src/BuildingBlocks/BuildingBlocks.Observability/BuildingBlocks.Observability.csproj",
         "projectName": "BuildingBlocks.Observability",
-        "projectPath": "/home/lcaraballo/Documentos/Sofka Projects/Projects/rlapp-backend/src/BuildingBlocks/BuildingBlocks.Observability/BuildingBlocks.Observability.csproj",
+        "projectPath": "/home/lcaraballo/Documentos/Sofka Projects/Projects/rlapp/rlapp-backend/src/BuildingBlocks/BuildingBlocks.Observability/BuildingBlocks.Observability.csproj",
         "packagesPath": "/home/lcaraballo/.nuget/packages/",
-        "outputPath": "/home/lcaraballo/Documentos/Sofka Projects/Projects/rlapp-backend/src/BuildingBlocks/BuildingBlocks.Observability/obj/",
+        "outputPath": "/home/lcaraballo/Documentos/Sofka Projects/Projects/rlapp/rlapp-backend/src/BuildingBlocks/BuildingBlocks.Observability/obj/",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "/home/lcaraballo/.nuget/NuGet/NuGet.Config"
@@ -1010,14 +1010,14 @@
         }
       }
     },
-    "/home/lcaraballo/Documentos/Sofka Projects/Projects/rlapp-backend/src/Services/WaitingRoom/WaitingRoom.Application/WaitingRoom.Application.csproj": {
+    "/home/lcaraballo/Documentos/Sofka Projects/Projects/rlapp/rlapp-backend/src/Services/WaitingRoom/WaitingRoom.Application/WaitingRoom.Application.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/home/lcaraballo/Documentos/Sofka Projects/Projects/rlapp-backend/src/Services/WaitingRoom/WaitingRoom.Application/WaitingRoom.Application.csproj",
+        "projectUniqueName": "/home/lcaraballo/Documentos/Sofka Projects/Projects/rlapp/rlapp-backend/src/Services/WaitingRoom/WaitingRoom.Application/WaitingRoom.Application.csproj",
         "projectName": "WaitingRoom.Application",
-        "projectPath": "/home/lcaraballo/Documentos/Sofka Projects/Projects/rlapp-backend/src/Services/WaitingRoom/WaitingRoom.Application/WaitingRoom.Application.csproj",
+        "projectPath": "/home/lcaraballo/Documentos/Sofka Projects/Projects/rlapp/rlapp-backend/src/Services/WaitingRoom/WaitingRoom.Application/WaitingRoom.Application.csproj",
         "packagesPath": "/home/lcaraballo/.nuget/packages/",
-        "outputPath": "/home/lcaraballo/Documentos/Sofka Projects/Projects/rlapp-backend/src/Services/WaitingRoom/WaitingRoom.Application/obj/",
+        "outputPath": "/home/lcaraballo/Documentos/Sofka Projects/Projects/rlapp/rlapp-backend/src/Services/WaitingRoom/WaitingRoom.Application/obj/",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "/home/lcaraballo/.nuget/NuGet/NuGet.Config"
@@ -1033,8 +1033,8 @@
           "net10.0": {
             "targetAlias": "net10.0",
             "projectReferences": {
-              "/home/lcaraballo/Documentos/Sofka Projects/Projects/rlapp-backend/src/Services/WaitingRoom/WaitingRoom.Domain/WaitingRoom.Domain.csproj": {
-                "projectPath": "/home/lcaraballo/Documentos/Sofka Projects/Projects/rlapp-backend/src/Services/WaitingRoom/WaitingRoom.Domain/WaitingRoom.Domain.csproj"
+              "/home/lcaraballo/Documentos/Sofka Projects/Projects/rlapp/rlapp-backend/src/Services/WaitingRoom/WaitingRoom.Domain/WaitingRoom.Domain.csproj": {
+                "projectPath": "/home/lcaraballo/Documentos/Sofka Projects/Projects/rlapp/rlapp-backend/src/Services/WaitingRoom/WaitingRoom.Domain/WaitingRoom.Domain.csproj"
               }
             }
           }
@@ -1348,14 +1348,14 @@
         }
       }
     },
-    "/home/lcaraballo/Documentos/Sofka Projects/Projects/rlapp-backend/src/Services/WaitingRoom/WaitingRoom.Domain/WaitingRoom.Domain.csproj": {
+    "/home/lcaraballo/Documentos/Sofka Projects/Projects/rlapp/rlapp-backend/src/Services/WaitingRoom/WaitingRoom.Domain/WaitingRoom.Domain.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/home/lcaraballo/Documentos/Sofka Projects/Projects/rlapp-backend/src/Services/WaitingRoom/WaitingRoom.Domain/WaitingRoom.Domain.csproj",
+        "projectUniqueName": "/home/lcaraballo/Documentos/Sofka Projects/Projects/rlapp/rlapp-backend/src/Services/WaitingRoom/WaitingRoom.Domain/WaitingRoom.Domain.csproj",
         "projectName": "WaitingRoom.Domain",
-        "projectPath": "/home/lcaraballo/Documentos/Sofka Projects/Projects/rlapp-backend/src/Services/WaitingRoom/WaitingRoom.Domain/WaitingRoom.Domain.csproj",
+        "projectPath": "/home/lcaraballo/Documentos/Sofka Projects/Projects/rlapp/rlapp-backend/src/Services/WaitingRoom/WaitingRoom.Domain/WaitingRoom.Domain.csproj",
         "packagesPath": "/home/lcaraballo/.nuget/packages/",
-        "outputPath": "/home/lcaraballo/Documentos/Sofka Projects/Projects/rlapp-backend/src/Services/WaitingRoom/WaitingRoom.Domain/obj/",
+        "outputPath": "/home/lcaraballo/Documentos/Sofka Projects/Projects/rlapp/rlapp-backend/src/Services/WaitingRoom/WaitingRoom.Domain/obj/",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "/home/lcaraballo/.nuget/NuGet/NuGet.Config"
@@ -1371,8 +1371,8 @@
           "net10.0": {
             "targetAlias": "net10.0",
             "projectReferences": {
-              "/home/lcaraballo/Documentos/Sofka Projects/Projects/rlapp-backend/src/BuildingBlocks/BuildingBlocks.EventSourcing/BuildingBlocks.EventSourcing.csproj": {
-                "projectPath": "/home/lcaraballo/Documentos/Sofka Projects/Projects/rlapp-backend/src/BuildingBlocks/BuildingBlocks.EventSourcing/BuildingBlocks.EventSourcing.csproj"
+              "/home/lcaraballo/Documentos/Sofka Projects/Projects/rlapp/rlapp-backend/src/BuildingBlocks/BuildingBlocks.EventSourcing/BuildingBlocks.EventSourcing.csproj": {
+                "projectPath": "/home/lcaraballo/Documentos/Sofka Projects/Projects/rlapp/rlapp-backend/src/BuildingBlocks/BuildingBlocks.EventSourcing/BuildingBlocks.EventSourcing.csproj"
               }
             }
           }
@@ -1686,14 +1686,14 @@
         }
       }
     },
-    "/home/lcaraballo/Documentos/Sofka Projects/Projects/rlapp-backend/src/Services/WaitingRoom/WaitingRoom.Infrastructure/WaitingRoom.Infrastructure.csproj": {
+    "/home/lcaraballo/Documentos/Sofka Projects/Projects/rlapp/rlapp-backend/src/Services/WaitingRoom/WaitingRoom.Infrastructure/WaitingRoom.Infrastructure.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/home/lcaraballo/Documentos/Sofka Projects/Projects/rlapp-backend/src/Services/WaitingRoom/WaitingRoom.Infrastructure/WaitingRoom.Infrastructure.csproj",
+        "projectUniqueName": "/home/lcaraballo/Documentos/Sofka Projects/Projects/rlapp/rlapp-backend/src/Services/WaitingRoom/WaitingRoom.Infrastructure/WaitingRoom.Infrastructure.csproj",
         "projectName": "WaitingRoom.Infrastructure",
-        "projectPath": "/home/lcaraballo/Documentos/Sofka Projects/Projects/rlapp-backend/src/Services/WaitingRoom/WaitingRoom.Infrastructure/WaitingRoom.Infrastructure.csproj",
+        "projectPath": "/home/lcaraballo/Documentos/Sofka Projects/Projects/rlapp/rlapp-backend/src/Services/WaitingRoom/WaitingRoom.Infrastructure/WaitingRoom.Infrastructure.csproj",
         "packagesPath": "/home/lcaraballo/.nuget/packages/",
-        "outputPath": "/home/lcaraballo/Documentos/Sofka Projects/Projects/rlapp-backend/src/Services/WaitingRoom/WaitingRoom.Infrastructure/obj/",
+        "outputPath": "/home/lcaraballo/Documentos/Sofka Projects/Projects/rlapp/rlapp-backend/src/Services/WaitingRoom/WaitingRoom.Infrastructure/obj/",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "/home/lcaraballo/.nuget/NuGet/NuGet.Config"
@@ -1709,20 +1709,20 @@
           "net10.0": {
             "targetAlias": "net10.0",
             "projectReferences": {
-              "/home/lcaraballo/Documentos/Sofka Projects/Projects/rlapp-backend/src/BuildingBlocks/BuildingBlocks.EventSourcing/BuildingBlocks.EventSourcing.csproj": {
-                "projectPath": "/home/lcaraballo/Documentos/Sofka Projects/Projects/rlapp-backend/src/BuildingBlocks/BuildingBlocks.EventSourcing/BuildingBlocks.EventSourcing.csproj"
+              "/home/lcaraballo/Documentos/Sofka Projects/Projects/rlapp/rlapp-backend/src/BuildingBlocks/BuildingBlocks.EventSourcing/BuildingBlocks.EventSourcing.csproj": {
+                "projectPath": "/home/lcaraballo/Documentos/Sofka Projects/Projects/rlapp/rlapp-backend/src/BuildingBlocks/BuildingBlocks.EventSourcing/BuildingBlocks.EventSourcing.csproj"
               },
-              "/home/lcaraballo/Documentos/Sofka Projects/Projects/rlapp-backend/src/BuildingBlocks/BuildingBlocks.Messaging/BuildingBlocks.Messaging.csproj": {
-                "projectPath": "/home/lcaraballo/Documentos/Sofka Projects/Projects/rlapp-backend/src/BuildingBlocks/BuildingBlocks.Messaging/BuildingBlocks.Messaging.csproj"
+              "/home/lcaraballo/Documentos/Sofka Projects/Projects/rlapp/rlapp-backend/src/BuildingBlocks/BuildingBlocks.Messaging/BuildingBlocks.Messaging.csproj": {
+                "projectPath": "/home/lcaraballo/Documentos/Sofka Projects/Projects/rlapp/rlapp-backend/src/BuildingBlocks/BuildingBlocks.Messaging/BuildingBlocks.Messaging.csproj"
               },
-              "/home/lcaraballo/Documentos/Sofka Projects/Projects/rlapp-backend/src/BuildingBlocks/BuildingBlocks.Observability/BuildingBlocks.Observability.csproj": {
-                "projectPath": "/home/lcaraballo/Documentos/Sofka Projects/Projects/rlapp-backend/src/BuildingBlocks/BuildingBlocks.Observability/BuildingBlocks.Observability.csproj"
+              "/home/lcaraballo/Documentos/Sofka Projects/Projects/rlapp/rlapp-backend/src/BuildingBlocks/BuildingBlocks.Observability/BuildingBlocks.Observability.csproj": {
+                "projectPath": "/home/lcaraballo/Documentos/Sofka Projects/Projects/rlapp/rlapp-backend/src/BuildingBlocks/BuildingBlocks.Observability/BuildingBlocks.Observability.csproj"
               },
-              "/home/lcaraballo/Documentos/Sofka Projects/Projects/rlapp-backend/src/Services/WaitingRoom/WaitingRoom.Application/WaitingRoom.Application.csproj": {
-                "projectPath": "/home/lcaraballo/Documentos/Sofka Projects/Projects/rlapp-backend/src/Services/WaitingRoom/WaitingRoom.Application/WaitingRoom.Application.csproj"
+              "/home/lcaraballo/Documentos/Sofka Projects/Projects/rlapp/rlapp-backend/src/Services/WaitingRoom/WaitingRoom.Application/WaitingRoom.Application.csproj": {
+                "projectPath": "/home/lcaraballo/Documentos/Sofka Projects/Projects/rlapp/rlapp-backend/src/Services/WaitingRoom/WaitingRoom.Application/WaitingRoom.Application.csproj"
               },
-              "/home/lcaraballo/Documentos/Sofka Projects/Projects/rlapp-backend/src/Services/WaitingRoom/WaitingRoom.Domain/WaitingRoom.Domain.csproj": {
-                "projectPath": "/home/lcaraballo/Documentos/Sofka Projects/Projects/rlapp-backend/src/Services/WaitingRoom/WaitingRoom.Domain/WaitingRoom.Domain.csproj"
+              "/home/lcaraballo/Documentos/Sofka Projects/Projects/rlapp/rlapp-backend/src/Services/WaitingRoom/WaitingRoom.Domain/WaitingRoom.Domain.csproj": {
+                "projectPath": "/home/lcaraballo/Documentos/Sofka Projects/Projects/rlapp/rlapp-backend/src/Services/WaitingRoom/WaitingRoom.Domain/WaitingRoom.Domain.csproj"
               }
             }
           }
@@ -2054,14 +2054,14 @@
         }
       }
     },
-    "/home/lcaraballo/Documentos/Sofka Projects/Projects/rlapp-backend/src/Services/WaitingRoom/WaitingRoom.Worker/WaitingRoom.Worker.csproj": {
+    "/home/lcaraballo/Documentos/Sofka Projects/Projects/rlapp/rlapp-backend/src/Services/WaitingRoom/WaitingRoom.Worker/WaitingRoom.Worker.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/home/lcaraballo/Documentos/Sofka Projects/Projects/rlapp-backend/src/Services/WaitingRoom/WaitingRoom.Worker/WaitingRoom.Worker.csproj",
+        "projectUniqueName": "/home/lcaraballo/Documentos/Sofka Projects/Projects/rlapp/rlapp-backend/src/Services/WaitingRoom/WaitingRoom.Worker/WaitingRoom.Worker.csproj",
         "projectName": "WaitingRoom.Worker",
-        "projectPath": "/home/lcaraballo/Documentos/Sofka Projects/Projects/rlapp-backend/src/Services/WaitingRoom/WaitingRoom.Worker/WaitingRoom.Worker.csproj",
+        "projectPath": "/home/lcaraballo/Documentos/Sofka Projects/Projects/rlapp/rlapp-backend/src/Services/WaitingRoom/WaitingRoom.Worker/WaitingRoom.Worker.csproj",
         "packagesPath": "/home/lcaraballo/.nuget/packages/",
-        "outputPath": "/home/lcaraballo/Documentos/Sofka Projects/Projects/rlapp-backend/src/Services/WaitingRoom/WaitingRoom.Worker/obj/",
+        "outputPath": "/home/lcaraballo/Documentos/Sofka Projects/Projects/rlapp/rlapp-backend/src/Services/WaitingRoom/WaitingRoom.Worker/obj/",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "/home/lcaraballo/.nuget/NuGet/NuGet.Config"
@@ -2077,11 +2077,11 @@
           "net10.0": {
             "targetAlias": "net10.0",
             "projectReferences": {
-              "/home/lcaraballo/Documentos/Sofka Projects/Projects/rlapp-backend/src/BuildingBlocks/BuildingBlocks.EventSourcing/BuildingBlocks.EventSourcing.csproj": {
-                "projectPath": "/home/lcaraballo/Documentos/Sofka Projects/Projects/rlapp-backend/src/BuildingBlocks/BuildingBlocks.EventSourcing/BuildingBlocks.EventSourcing.csproj"
+              "/home/lcaraballo/Documentos/Sofka Projects/Projects/rlapp/rlapp-backend/src/BuildingBlocks/BuildingBlocks.EventSourcing/BuildingBlocks.EventSourcing.csproj": {
+                "projectPath": "/home/lcaraballo/Documentos/Sofka Projects/Projects/rlapp/rlapp-backend/src/BuildingBlocks/BuildingBlocks.EventSourcing/BuildingBlocks.EventSourcing.csproj"
               },
-              "/home/lcaraballo/Documentos/Sofka Projects/Projects/rlapp-backend/src/Services/WaitingRoom/WaitingRoom.Infrastructure/WaitingRoom.Infrastructure.csproj": {
-                "projectPath": "/home/lcaraballo/Documentos/Sofka Projects/Projects/rlapp-backend/src/Services/WaitingRoom/WaitingRoom.Infrastructure/WaitingRoom.Infrastructure.csproj"
+              "/home/lcaraballo/Documentos/Sofka Projects/Projects/rlapp/rlapp-backend/src/Services/WaitingRoom/WaitingRoom.Infrastructure/WaitingRoom.Infrastructure.csproj": {
+                "projectPath": "/home/lcaraballo/Documentos/Sofka Projects/Projects/rlapp/rlapp-backend/src/Services/WaitingRoom/WaitingRoom.Infrastructure/WaitingRoom.Infrastructure.csproj"
               }
             }
           }

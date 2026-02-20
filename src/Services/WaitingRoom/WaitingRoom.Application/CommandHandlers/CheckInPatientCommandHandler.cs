@@ -2,7 +2,6 @@ namespace WaitingRoom.Application.CommandHandlers;
 
 using BuildingBlocks.EventSourcing;
 using WaitingRoom.Application.Commands;
-using WaitingRoom.Application.Exceptions;
 using WaitingRoom.Application.Ports;
 using WaitingRoom.Domain.Aggregates;
 using WaitingRoom.Domain.Commands;
@@ -25,6 +24,8 @@ using WaitingRoom.Domain.ValueObjects;
 /// </summary>
 public sealed class CheckInPatientCommandHandler
 {
+    private const int DefaultQueueCapacity = 100;
+
     private readonly IEventStore _eventStore;
     private readonly IEventPublisher _eventPublisher;
     private readonly IClock _clock;
@@ -54,7 +55,9 @@ public sealed class CheckInPatientCommandHandler
     /// <param name="command">The check-in command.</param>
     /// <param name="cancellationToken">Cancellation token.</param>
     /// <returns>Event count indicating success.</returns>
-    /// <exception cref="AggregateNotFoundException">If queue not found.</exception>
+    /// <remarks>
+    /// If queue does not exist, the handler bootstraps it with default capacity.
+    /// </remarks>
     /// <exception cref="EventConflictException">If version conflict (concurrent modification).</exception>
     /// <exception cref="DomainException">If domain invariant violation (from Domain layer).</exception>
     public async Task<int> HandleAsync(
@@ -63,8 +66,21 @@ public sealed class CheckInPatientCommandHandler
     {
         // STEP 1: Load the aggregate from event store
         // This reconstructs the complete aggregate state from all past events
-        var queue = await _eventStore.LoadAsync(command.QueueId, cancellationToken)
-            ?? throw new AggregateNotFoundException(command.QueueId);
+        var queue = await _eventStore.LoadAsync(command.QueueId, cancellationToken);
+
+        if (queue is null)
+        {
+            var queueMetadata = EventMetadata.CreateNew(
+                aggregateId: command.QueueId,
+                actor: command.Actor,
+                correlationId: command.CorrelationId ?? Guid.NewGuid().ToString());
+
+            queue = WaitingQueue.Create(
+                queueId: command.QueueId,
+                queueName: command.QueueId,
+                maxCapacity: DefaultQueueCapacity,
+                metadata: queueMetadata);
+        }
 
         // STEP 2: Execute domain logic
         // The aggregate applies all business rules to verify check-in is valid

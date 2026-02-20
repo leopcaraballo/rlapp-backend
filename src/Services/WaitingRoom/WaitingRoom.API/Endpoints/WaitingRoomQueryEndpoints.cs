@@ -201,7 +201,7 @@ public static class WaitingRoomQueryEndpoints
 
     private static async Task<IResult> GetRecentHistoryAsync(
         string queueId,
-        int limit,
+        int? limit,
         IWaitingRoomProjectionContext context,
         CancellationToken cancellationToken)
     {
@@ -214,7 +214,11 @@ public static class WaitingRoomQueryEndpoints
 
         try
         {
-            var history = await context.GetRecentAttentionHistoryAsync(queueId, limit <= 0 ? 20 : limit, cancellationToken);
+            var effectiveLimit = limit.GetValueOrDefault(20);
+            if (effectiveLimit <= 0)
+                effectiveLimit = 20;
+
+            var history = await context.GetRecentAttentionHistoryAsync(queueId, effectiveLimit, cancellationToken);
             return Results.Ok(history);
         }
         catch (Exception)

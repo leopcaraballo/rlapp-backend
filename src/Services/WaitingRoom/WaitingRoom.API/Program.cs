@@ -123,6 +123,17 @@ services.AddSingleton<IProjection>(sp =>
 services.AddEndpointsApiExplorer();
 services.AddOpenApi();  // Use native .NET 10 OpenAPI instead of Swagger
 
+services.AddCors(options =>
+{
+    options.AddPolicy("FrontendDev", policy =>
+    {
+        policy
+            .WithOrigins("http://localhost:3000", "http://127.0.0.1:3000")
+            .AllowAnyHeader()
+            .AllowAnyMethod();
+    });
+});
+
 // Health Checks
 services.AddHealthChecks()
     .AddCheck("self", () => Microsoft.Extensions.Diagnostics.HealthChecks.HealthCheckResult.Healthy())
@@ -137,14 +148,14 @@ var app = builder.Build();
 // Middleware Pipeline (order matters)
 app.UseCorrelationId();
 app.UseMiddleware<ExceptionHandlerMiddleware>();
+app.UseCors("FrontendDev");
 
 // Development tools
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();  // Serve OpenAPI schema at /openapi/v1.json
+    app.UseHttpsRedirection();
 }
-
-app.UseHttpsRedirection();
 
 // ==============================================================================
 // HEALTH CHECKS ENDPOINTS

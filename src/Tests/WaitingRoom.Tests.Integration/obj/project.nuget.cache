@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "uCfhnegOqyM=",
+  "dgSpecHash": "qJNvNnGniHY=",
   "success": true,
-  "projectFilePath": "/home/lcaraballo/Documentos/Sofka Projects/Projects/rlapp-backend/src/Tests/WaitingRoom.Tests.Integration/WaitingRoom.Tests.Integration.csproj",
+  "projectFilePath": "/home/lcaraballo/Documentos/Sofka Projects/Projects/rlapp/rlapp-backend/src/Tests/WaitingRoom.Tests.Integration/WaitingRoom.Tests.Integration.csproj",
   "expectedPackageFiles": [
     "/home/lcaraballo/.nuget/packages/castle.core/5.1.1/castle.core.5.1.1.nupkg.sha512",
     "/home/lcaraballo/.nuget/packages/dapper/2.1.35/dapper.2.1.35.nupkg.sha512",

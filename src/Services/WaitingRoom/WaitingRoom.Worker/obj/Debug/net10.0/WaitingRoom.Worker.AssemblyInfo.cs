@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("WaitingRoom.Worker")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+02f363423cceb62dfbb81d6cbc8253d170936a63")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+51f80d5e7b041754b7a5850b5963ec3f2e5625b0")]
 [assembly: System.Reflection.AssemblyProductAttribute("WaitingRoom.Worker")]
 [assembly: System.Reflection.AssemblyTitleAttribute("WaitingRoom.Worker")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

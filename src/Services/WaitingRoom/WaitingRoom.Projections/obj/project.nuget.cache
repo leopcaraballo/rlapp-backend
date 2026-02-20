@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "NqX6Be1pzCA=",
+  "dgSpecHash": "0NcDvs8PAKg=",
   "success": true,
-  "projectFilePath": "/home/lcaraballo/Documentos/Sofka Projects/Projects/rlapp-backend/src/Services/WaitingRoom/WaitingRoom.Projections/WaitingRoom.Projections.csproj",
+  "projectFilePath": "/home/lcaraballo/Documentos/Sofka Projects/Projects/rlapp/rlapp-backend/src/Services/WaitingRoom/WaitingRoom.Projections/WaitingRoom.Projections.csproj",
   "expectedPackageFiles": [
     "/home/lcaraballo/.nuget/packages/microsoft.extensions.configuration/9.0.0/microsoft.extensions.configuration.9.0.0.nupkg.sha512",
     "/home/lcaraballo/.nuget/packages/microsoft.extensions.configuration.abstractions/9.0.0/microsoft.extensions.configuration.abstractions.9.0.0.nupkg.sha512",

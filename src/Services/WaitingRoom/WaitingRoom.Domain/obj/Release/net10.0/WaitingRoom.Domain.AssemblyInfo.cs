@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("WaitingRoom.Domain")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Release")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+2d6b40daa471038e2fc852e8c684ba0bfa5ee1d7")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+51f80d5e7b041754b7a5850b5963ec3f2e5625b0")]
 [assembly: System.Reflection.AssemblyProductAttribute("WaitingRoom.Domain")]
 [assembly: System.Reflection.AssemblyTitleAttribute("WaitingRoom.Domain")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
