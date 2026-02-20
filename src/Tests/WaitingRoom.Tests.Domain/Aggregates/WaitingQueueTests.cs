@@ -3,6 +3,7 @@ namespace WaitingRoom.Tests.Domain.Aggregates;
 using FluentAssertions;
 using BuildingBlocks.EventSourcing;
 using WaitingRoom.Domain.Aggregates;
+using WaitingRoom.Domain.Commands;
 using WaitingRoom.Domain.ValueObjects;
 using WaitingRoom.Domain.Events;
 using WaitingRoom.Domain.Exceptions;
@@ -19,6 +20,27 @@ public class WaitingQueueTests
         var queue = WaitingQueue.Create(queueId, queueName, maxCapacity, metadata);
         queue.ClearUncommittedEvents();
         return queue;
+    }
+
+    private static CheckInPatientRequest CreateCheckInRequest(
+        string patientId = "PAT-001",
+        string patientName = "John Doe",
+        string priority = Priority.Low,
+        string consultationType = "General",
+        DateTime? checkInTime = null,
+        string? notes = null)
+    {
+        var metadata = EventMetadata.CreateNew("QUEUE-01", "nurse");
+        return new CheckInPatientRequest
+        {
+            PatientId = PatientId.Create(patientId),
+            PatientName = patientName,
+            Priority = Priority.Create(priority),
+            ConsultationType = ConsultationType.Create(consultationType),
+            CheckInTime = checkInTime ?? DateTime.UtcNow,
+            Metadata = metadata,
+            Notes = notes
+        };
     }
 
     [Fact]
@@ -53,19 +75,9 @@ public class WaitingQueueTests
     public void CheckInPatient_WithValidData_EmitsPatientCheckedInEvent()
     {
         var queue = CreateQueue();
-        var patientId = PatientId.Create("PAT-001");
-        var priority = Priority.Create(Priority.High);
-        var consultationType = ConsultationType.Create("General");
-        var metadata = EventMetadata.CreateNew(queue.Id, "nurse");
+        var request = CreateCheckInRequest("PAT-001", "John Doe", Priority.High);
 
-        queue.CheckInPatient(
-            patientId: patientId,
-            patientName: "John Doe",
-            priority: priority,
-            consultationType: consultationType,
-            checkInTime: DateTime.UtcNow,
-            metadata: metadata
-        );
+        queue.CheckInPatient(request);
 
         queue.HasUncommittedEvents.Should().BeTrue();
         queue.UncommittedEvents.Should().HaveCount(1);
@@ -77,28 +89,14 @@ public class WaitingQueueTests
     public void CheckInPatient_AtCapacity_ThrowsDomainException()
     {
         var queue = CreateQueue(maxCapacity: 1);
-        var metadata1 = EventMetadata.CreateNew(queue.Id, "nurse");
+        var request1 = CreateCheckInRequest("PAT-001", "Patient 1", Priority.Low);
 
-        queue.CheckInPatient(
-            PatientId.Create("PAT-001"),
-            "Patient 1",
-            Priority.Create(Priority.Low),
-            ConsultationType.Create("General"),
-            DateTime.UtcNow,
-            metadata1
-        );
+        queue.CheckInPatient(request1);
 
-        var metadata2 = EventMetadata.CreateNew(queue.Id, "nurse");
+        var request2 = CreateCheckInRequest("PAT-002", "Patient 2", Priority.Low);
 
         Assert.Throws<DomainException>(() =>
-            queue.CheckInPatient(
-                PatientId.Create("PAT-002"),
-                "Patient 2",
-                Priority.Create(Priority.Low),
-                ConsultationType.Create("General"),
-                DateTime.UtcNow,
-                metadata2
-            )
+            queue.CheckInPatient(request2)
         );
     }
 
@@ -106,17 +104,12 @@ public class WaitingQueueTests
     public void CheckInPatient_DuplicatePatient_ThrowsDomainException()
     {
         var queue = CreateQueue();
-        var patientId = PatientId.Create("PAT-001");
-        var priority = Priority.Create(Priority.Low);
-        var consultationType = ConsultationType.Create("General");
-        var metadata1 = EventMetadata.CreateNew(queue.Id, "nurse");
+        var request = CreateCheckInRequest("PAT-001", "John Doe", Priority.Low);
 
-        queue.CheckInPatient(patientId, "John Doe", priority, consultationType, DateTime.UtcNow, metadata1);
-
-        var metadata2 = EventMetadata.CreateNew(queue.Id, "nurse");
+        queue.CheckInPatient(request);
 
         Assert.Throws<DomainException>(() =>
-            queue.CheckInPatient(patientId, "John Doe", priority, consultationType, DateTime.UtcNow, metadata2)
+            queue.CheckInPatient(request)
         );
     }
 
@@ -124,26 +117,11 @@ public class WaitingQueueTests
     public void CheckInPatient_MultiplePatients_MaintainsOrder()
     {
         var queue = CreateQueue();
-        var metadata1 = EventMetadata.CreateNew(queue.Id, "nurse");
-        var metadata2 = EventMetadata.CreateNew(queue.Id, "nurse");
+        var request1 = CreateCheckInRequest("PAT-001", "Patient 1", Priority.Low);
+        var request2 = CreateCheckInRequest("PAT-002", "Patient 2", Priority.Medium);
 
-        queue.CheckInPatient(
-            PatientId.Create("PAT-001"),
-            "Patient 1",
-            Priority.Create(Priority.Low),
-            ConsultationType.Create("General"),
-            DateTime.UtcNow,
-            metadata1
-        );
-
-        queue.CheckInPatient(
-            PatientId.Create("PAT-002"),
-            "Patient 2",
-            Priority.Create(Priority.Medium),
-            ConsultationType.Create("General"),
-            DateTime.UtcNow,
-            metadata2
-        );
+        queue.CheckInPatient(request1);
+        queue.CheckInPatient(request2);
 
         queue.CurrentCount.Should().Be(2);
         queue.Patients[0].PatientId.Value.Should().Be("PAT-001");
@@ -158,15 +136,8 @@ public class WaitingQueueTests
         queue.IsAtCapacity.Should().BeFalse();
         queue.AvailableCapacity.Should().Be(5);
 
-        var metadata = EventMetadata.CreateNew(queue.Id, "nurse");
-        queue.CheckInPatient(
-            PatientId.Create("PAT-001"),
-            "Patient 1",
-            Priority.Create(Priority.Low),
-            ConsultationType.Create("General"),
-            DateTime.UtcNow,
-            metadata
-        );
+        var request = CreateCheckInRequest("PAT-001", "Patient 1", Priority.Low);
+        queue.CheckInPatient(request);
 
         queue.CurrentCount.Should().Be(1);
         queue.AvailableCapacity.Should().Be(4);
@@ -177,15 +148,8 @@ public class WaitingQueueTests
     public void ClearUncommittedEvents_AppliesToState()
     {
         var queue = CreateQueue();
-        var metadata = EventMetadata.CreateNew(queue.Id, "nurse");
-        queue.CheckInPatient(
-            PatientId.Create("PAT-001"),
-            "Patient 1",
-            Priority.Create(Priority.Low),
-            ConsultationType.Create("General"),
-            DateTime.UtcNow,
-            metadata
-        );
+        var request = CreateCheckInRequest("PAT-001", "Patient 1", Priority.Low);
+        queue.CheckInPatient(request);
 
         queue.ClearUncommittedEvents();
 
@@ -201,13 +165,28 @@ public class WaitingQueueTests
         var queue2 = CreateQueue("QUEUE-01");
 
         var now = DateTime.UtcNow;
-        var patientId = PatientId.Create("PAT-001");
-        var priority = Priority.Create(Priority.High);
-        var consultationType = ConsultationType.Create("General");
-        var metadata = EventMetadata.CreateNew("QUEUE-01", "nurse");
+        var request1 = new CheckInPatientRequest
+        {
+            PatientId = PatientId.Create("PAT-001"),
+            PatientName = "John Doe",
+            Priority = Priority.Create(Priority.High),
+            ConsultationType = ConsultationType.Create("General"),
+            CheckInTime = now,
+            Metadata = EventMetadata.CreateNew("QUEUE-01", "nurse")
+        };
 
-        queue1.CheckInPatient(patientId, "John Doe", priority, consultationType, now, metadata);
-        queue2.CheckInPatient(patientId, "John Doe", priority, consultationType, now, metadata);
+        var request2 = new CheckInPatientRequest
+        {
+            PatientId = PatientId.Create("PAT-001"),
+            PatientName = "John Doe",
+            Priority = Priority.Create(Priority.High),
+            ConsultationType = ConsultationType.Create("General"),
+            CheckInTime = now,
+            Metadata = EventMetadata.CreateNew("QUEUE-01", "nurse")
+        };
+
+        queue1.CheckInPatient(request1);
+        queue2.CheckInPatient(request2);
 
         queue1.CurrentCount.Should().Be(queue2.CurrentCount);
         queue1.Patients[0].PatientName.Should().Be(queue2.Patients[0].PatientName);

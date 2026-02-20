@@ -23,35 +23,32 @@ public sealed record CheckInPatientRequest
     /// <summary>
     /// Unique patient identifier.
     /// </summary>
-    public PatientId PatientId { get; init; }
+public required PatientId PatientId { get; init; }
 
-    /// <summary>
-    /// Patient name for display.
-    /// </summary>
-    public string PatientName { get; init; }
+/// <summary>
+/// Patient name for display.
+/// </summary>
+public required string PatientName { get; init; }
 
-    /// <summary>
-    /// Queue priority (Low, Medium, High, Urgent).
-    /// </summary>
-    public Priority Priority { get; init; }
+/// <summary>
+/// Queue priority (Low, Medium, High, Urgent).
+/// </summary>
+public required Priority Priority { get; init; }
 
-    /// <summary>
-    /// Type of consultation (e.g., Cardiology, Dentistry).
-    /// </summary>
-    public ConsultationType ConsultationType { get; init; }
+/// <summary>
+/// Type of consultation (e.g., Cardiology, Dentistry).
+/// </summary>
+public required ConsultationType ConsultationType { get; init; }
 
-    /// <summary>
-    /// When patient checked in to the queue.
-    /// </summary>
-    public DateTime CheckInTime { get; init; }
+/// <summary>
+/// When patient checked in to the queue.
+/// </summary>
+public required DateTime CheckInTime { get; init; }
 
-    /// <summary>
-    /// Event metadata for traceability and idempotency.
-    /// </summary>
-    public EventMetadata Metadata { get; init; }
-
-    /// <summary>
-    /// Optional notes about the patient or check-in.
+/// <summary>
+/// Event metadata for traceability and idempotency.
+/// </summary>
+public required EventMetadata Metadata { get; init; }
     /// </summary>
     public string? Notes { get; init; }
 

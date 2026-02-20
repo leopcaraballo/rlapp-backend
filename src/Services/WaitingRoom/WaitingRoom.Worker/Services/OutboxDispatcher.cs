@@ -4,7 +4,6 @@ using Microsoft.Extensions.Logging;
 using BuildingBlocks.EventSourcing;
 using BuildingBlocks.Observability;
 using WaitingRoom.Application.Ports;
-using WaitingRoom.Infrastructure.Persistence.Outbox;
 using WaitingRoom.Infrastructure.Serialization;
 
 /// <summary>

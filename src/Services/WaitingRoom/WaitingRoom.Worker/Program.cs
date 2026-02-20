@@ -60,7 +60,7 @@ var host = Host.CreateDefaultBuilder(args)
         {
             var options = sp.GetRequiredService<RabbitMqOptions>();
             var serializer = sp.GetRequiredService<EventSerializer>();
-            var outboxStore = (PostgresOutboxStore)sp.GetRequiredService<IOutboxStore>();
+            var outboxStore = sp.GetRequiredService<IOutboxStore>();
 
             // Inject outboxStore so it can mark messages as dispatched/failed
             return new RabbitMqEventPublisher(options, serializer, outboxStore);
@@ -84,8 +84,11 @@ var host = Host.CreateDefaultBuilder(args)
 var logger = host.Services.GetRequiredService<ILogger<Program>>();
 logger.LogInformation("Ensuring outbox database schema exists...");
 
-var outboxStore = (PostgresOutboxStore)host.Services.GetRequiredService<IOutboxStore>();
-await outboxStore.EnsureSchemaAsync();
+var outboxStore = host.Services.GetRequiredService<IOutboxStore>();
+if (outboxStore is PostgresOutboxStore postgresOutboxStore)
+{
+    await postgresOutboxStore.EnsureSchemaAsync();
+}
 
 logger.LogInformation("Database schema ready. Starting Outbox Worker...");
 

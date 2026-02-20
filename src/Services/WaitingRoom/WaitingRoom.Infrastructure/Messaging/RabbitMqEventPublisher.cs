@@ -4,19 +4,18 @@ using System.Text;
 using BuildingBlocks.EventSourcing;
 using RabbitMQ.Client;
 using WaitingRoom.Application.Ports;
-using WaitingRoom.Infrastructure.Persistence.Outbox;
 using WaitingRoom.Infrastructure.Serialization;
 
 internal sealed class RabbitMqEventPublisher : IEventPublisher
 {
     private readonly RabbitMqOptions _options;
     private readonly EventSerializer _serializer;
-    private readonly PostgresOutboxStore? _outboxStore;
+    private readonly IOutboxStore? _outboxStore;
 
     public RabbitMqEventPublisher(
         RabbitMqOptions options,
         EventSerializer serializer,
-        PostgresOutboxStore? outboxStore = null)
+        IOutboxStore? outboxStore = null)
     {
         _options = options ?? throw new ArgumentNullException(nameof(options));
         _serializer = serializer ?? throw new ArgumentNullException(nameof(serializer));

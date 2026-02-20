@@ -7,6 +7,7 @@ using WaitingRoom.Application.Commands;
 using WaitingRoom.Application.Exceptions;
 using WaitingRoom.Application.Ports;
 using WaitingRoom.Domain.Aggregates;
+using WaitingRoom.Domain.Commands;
 using WaitingRoom.Domain.ValueObjects;
 using WaitingRoom.Domain.Exceptions;
 using WaitingRoom.Domain.Events;
@@ -141,13 +142,16 @@ public class CheckInPatientCommandHandlerTests
         queue.ClearUncommittedEvents();
 
         // Add first patient to fill capacity
-        queue.CheckInPatient(
-            PatientId.Create("PAT-001"),
-            "John Doe",
-            Priority.Create(Priority.High),
-            ConsultationType.Create("General"),
-            DateTime.UtcNow,
-            EventMetadata.CreateNew(queueId, "nurse-001"));
+        var firstPatientRequest = new CheckInPatientRequest
+        {
+            PatientId = PatientId.Create("PAT-001"),
+            PatientName = "John Doe",
+            Priority = Priority.Create(Priority.High),
+            ConsultationType = ConsultationType.Create("General"),
+            CheckInTime = DateTime.UtcNow,
+            Metadata = EventMetadata.CreateNew(queueId, "nurse-001")
+        };
+        queue.CheckInPatient(firstPatientRequest);
 
         var eventStoreMock = new Mock<IEventStore>();
         var publisherMock = new Mock<IEventPublisher>();

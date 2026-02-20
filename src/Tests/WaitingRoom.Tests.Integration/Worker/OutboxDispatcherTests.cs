@@ -9,7 +9,6 @@ using FluentAssertions;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using WaitingRoom.Application.Ports;
-using WaitingRoom.Infrastructure.Persistence.Outbox;
 using WaitingRoom.Infrastructure.Serialization;
 using WaitingRoom.Worker;
 using WaitingRoom.Worker.Services;
@@ -256,6 +255,17 @@ internal sealed class FakeOutboxStore : IOutboxStore
     public void AddPendingMessage(OutboxMessage message)
     {
         _pendingMessages.Add(message);
+    }
+
+    public Task AddAsync(
+        List<OutboxMessage> messages,
+        System.Data.IDbConnection connection,
+        System.Data.IDbTransaction transaction,
+        CancellationToken cancellationToken = default)
+    {
+        // Fake implementation: just add to pending
+        _pendingMessages.AddRange(messages);
+        return Task.CompletedTask;
     }
 
     public Task<IReadOnlyList<OutboxMessage>> GetPendingAsync(

@@ -62,12 +62,10 @@ builder.Configuration.GetSection("RabbitMq").Bind(rabbitMqOptions);
 var services = builder.Services;
 
 // Infrastructure — Outbox Store
-services.AddSingleton<PostgresOutboxStore>(sp => new PostgresOutboxStore(connectionString));
-services.AddSingleton<IOutboxStore>(sp => sp.GetRequiredService<PostgresOutboxStore>());
+services.AddSingleton<IOutboxStore>(sp => new PostgresOutboxStore(connectionString));
 
 // Infrastructure — Lag Tracker
-services.AddSingleton<PostgresEventLagTracker>(sp => new PostgresEventLagTracker(connectionString));
-services.AddSingleton<IEventLagTracker>(sp => sp.GetRequiredService<PostgresEventLagTracker>());
+services.AddSingleton<IEventLagTracker>(sp => new PostgresEventLagTracker(connectionString));
 
 // Infrastructure — Event Type Registry
 services.AddSingleton<EventTypeRegistry>(sp => EventTypeRegistry.CreateDefault());
@@ -82,7 +80,7 @@ services.AddSingleton<IEventPublisher, OutboxEventPublisher>();
 services.AddSingleton<IEventStore>(sp =>
 {
     var serializer = sp.GetRequiredService<EventSerializer>();
-    var outboxStore = sp.GetRequiredService<PostgresOutboxStore>();
+    var outboxStore = sp.GetRequiredService<IOutboxStore>();
     var lagTracker = sp.GetRequiredService<IEventLagTracker>();
     return new PostgresEventStore(connectionString, serializer, outboxStore, lagTracker);
 });

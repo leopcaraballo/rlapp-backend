@@ -8,7 +8,6 @@ using Npgsql;
 using WaitingRoom.Application.Exceptions;
 using WaitingRoom.Application.Ports;
 using WaitingRoom.Domain.Aggregates;
-using WaitingRoom.Infrastructure.Persistence.Outbox;
 using WaitingRoom.Infrastructure.Serialization;
 
 internal sealed class PostgresEventStore : IEventStore

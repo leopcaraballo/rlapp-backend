@@ -1,7 +1,6 @@
 namespace WaitingRoom.Application.Ports;
 
 using System.Data;
-using WaitingRoom.Infrastructure.Persistence.Outbox;
 
 /// <summary>
 /// Port for Outbox persistence.
@@ -10,6 +9,7 @@ using WaitingRoom.Infrastructure.Persistence.Outbox;
 /// - Persist domain events in outbox table for reliable delivery
 /// - Enable implementation-agnostic outbox strategies
 /// - Support atomic transactions with event store
+/// - Track delivery status and retry logic
 ///
 /// Rationale:
 /// This interface ABSTRACTS the outbox pattern from EventStore.
@@ -45,4 +45,37 @@ public interface IOutboxStore
         IDbConnection connection,
         IDbTransaction transaction,
         CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Gets pending outbox messages ready for dispatch.
+    /// </summary>
+    /// <param name="batchSize">Number of messages to retrieve.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
+    /// <returns>List of pending outbox messages.</returns>
+    Task<IReadOnlyList<OutboxMessage>> GetPendingAsync(
+        int batchSize,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Marks events as successfully dispatched to message broker.
+    /// </summary>
+    /// <param name="eventIds">IDs of events that were dispatched.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
+    Task MarkDispatchedAsync(
+        IEnumerable<Guid> eventIds,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Marks event dispatch as failed and schedules retry.
+    /// </summary>
+    /// <param name="eventIds">IDs of events that failed dispatch.</param>
+    /// <param name="error">Error message explaining the failure.</param>
+    /// <param name="retryAfter">Time to wait before next retry attempt.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
+    Task MarkFailedAsync(
+        IEnumerable<Guid> eventIds,
+        string error,
+        TimeSpan retryAfter,
+        CancellationToken cancellationToken = default);
 }
+
