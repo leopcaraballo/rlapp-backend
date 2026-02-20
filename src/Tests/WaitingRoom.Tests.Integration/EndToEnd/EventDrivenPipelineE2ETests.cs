@@ -60,7 +60,7 @@ public sealed class EventDrivenPipelineE2ETests : IAsyncLifetime
     public EventDrivenPipelineE2ETests()
     {
         // Use test database
-        _testConnectionString = "Host=localhost;Port=5432;Database=waitingroom_test;Username=rlapp;Password=rlapp_secure_password";
+        _testConnectionString = "Host=localhost;Port=5432;Database=rlapp_waitingroom_test;Username=rlapp;Password=rlapp_secure_password";
 
         // Build service provider for test
         var services = new ServiceCollection();
