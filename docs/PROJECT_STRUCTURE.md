@@ -99,8 +99,12 @@ cd src/Services/WaitingRoom/WaitingRoom.Worker
 dotnet run
 
 # Verify API is running
-curl http://localhost:5000/health
-# Expected: {"status":"Healthy"}
+curl http://localhost:5000/health/live
+# Expected: Healthy (HTTP 200)
+
+# Readiness (includes dependencies)
+curl http://localhost:5000/health/ready
+# Expected: Healthy (HTTP 200)
 ```
 
 ---

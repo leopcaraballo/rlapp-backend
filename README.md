@@ -173,13 +173,13 @@ cp .env.template .env
 ### 3. Iniciar Infraestructura (Docker Compose)
 
 ```bash
-docker-compose up -d
+docker compose up -d
 
 # Verificar que servicios estén saludables
-docker-compose ps
+docker compose ps
 
 # Logs en tiempo real
-docker-compose logs -f
+docker compose logs -f
 ```
 
 **Servicios disponibles:**
@@ -203,6 +203,11 @@ dotnet run
 
 # La API estará disponible en http://localhost:5000
 ```
+
+**Nota:**
+
+- Ejecución local (`dotnet run`): `http://localhost:5000`
+- Ejecución containerizada (si API está publicada por compose): típicamente `http://localhost:8080`
 
 ### 6. Ejecutar Worker (en otra terminal)
 
@@ -345,17 +350,13 @@ Registra la entrada de un paciente a la cola de espera.
 - `409` - Conflicto de versión (modificación concurrente)
 - `500` - Error del servidor
 
-### GET /api/v1/waiting-room/{queueId}/monitor
+**Estado actual de publicación de API:**
 
-Obtiene métricas KPI de la cola.
+- Expuesto y operativo: `POST /api/waiting-room/check-in`
+- Health checks: `GET /health/live`, `GET /health/ready`
+- OpenAPI (solo Development): `GET /openapi/v1.json`
 
-### GET /api/v1/waiting-room/{queueId}/queue-state
-
-Obtiene estado detallado de la cola con lista de pacientes.
-
-### POST /api/v1/waiting-room/{queueId}/rebuild
-
-Inicia reconstrucción de proyecciones desde el event store.
+Los endpoints de query/proyecciones existen como implementación, pero no están publicados actualmente en el pipeline HTTP principal. Ver detalle en [API.md](docs/API.md).
 
 ---
 
@@ -484,6 +485,7 @@ logger.LogInformation(
 
 - [**PROJECT_STRUCTURE.md**](docs/PROJECT_STRUCTURE.md) - Estructura de proyecto y onboarding
 - [**API.md**](docs/API.md) - Contratos y endpoints
+- [**frontend-api-usage.md**](docs/api/frontend-api-usage.md) - Guía completa para integración frontend
 
 ---
 

@@ -6,6 +6,8 @@ Architectural diagrams following the C4 model (Context, Container, Component, Co
 **Notation:** Mermaid diagrams
 **Last Updated:** 2026-02-19
 
+> Runtime note: query/projection endpoints shown in component diagrams are implementation-level design. Current public contract is documented in [../API.md](../API.md).
+
 ---
 
 ## 📋 Table of Contents
