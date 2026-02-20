@@ -485,6 +485,12 @@ public async Task OutboxProcessor_Should_PublishAndMarkAsPublished()
    - Validate event schema
    - Check RabbitMQ queue
 
+## Operational Alignment (2026-02-20)
+
+- Outbox guarantees now cover the complete operational event set, including cashier alternate paths and consultation absence/cancellation.
+- Consulting-room activation/deactivation events are published through the same reliable pipeline.
+- This preserves at-least-once delivery and projection rebuildability for the updated clinical workflow.
+
 ---
 
 ## References

@@ -78,7 +78,7 @@ public async Task<int> HandleAsync(CheckInPatientCommand command)
 **Domain** enforces rules:
 
 ```csharp
-public void CheckInPatient(PatientId patientId, ...)
+public void CheckInPatient(CheckInPatientRequest request)
 {
     if (CurrentCount >= MaxCapacity)
         throw new DomainException("Queue at capacity");
@@ -330,6 +330,13 @@ public class CheckInPatientCommand
 ✅ Commands immutable records
 ✅ Handlers stateless services
 
+## Operational Alignment (2026-02-20)
+
+- Application orchestration is aligned with role-separated commands: reception, cashier, and medical.
+- Handlers now orchestrate additional command flows for payment pending/validation, cashier absence, cancellation by payment, and consultation absence.
+- Medical claim-next flow enforces active consulting-room validation before queue selection.
+- This ADR keeps the same architectural decision while reflecting the current operational workflow in runtime APIs.
+
 ## References
 
 - **Domain-Driven Design** (Eric Evans) - Bounded Contexts, Aggregates
@@ -339,9 +346,10 @@ public class CheckInPatientCommand
 
 ## Related ADRs
 
-- **ADR-001:** Domain Layer as Pure Event Sourcing Foundation
-- **ADR-003:** Infrastructure with Transactional Outbox (to be written)
-- **ADR-004:** API Layer as Presentation Adapter (to be written)
+- **ADR-004:** Event Sourcing as Primary Persistence Strategy
+- **ADR-005:** CQRS (Command Query Responsibility Segregation)
+- **ADR-007:** Hexagonal Architecture (Ports & Adapters)
+- **ADR-010:** Attention Workflow State Machine
 
 ---
 

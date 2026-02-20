@@ -47,9 +47,11 @@ public sealed class WaitingRoomProjectionEngine : IProjection
         _handlers = new Dictionary<string, IProjectionHandler>
         {
             [nameof(Domain.Events.PatientCheckedIn)] = new PatientCheckedInProjectionHandler(),
-            // Future handlers added here
-            // [nameof(PatientCalled)] = new PatientCalledHandler(),
-            // [nameof(PatientRemoved)] = new PatientRemovedHandler(),
+            [nameof(Domain.Events.PatientCalledAtCashier)] = new PatientCalledAtCashierProjectionHandler(),
+            [nameof(Domain.Events.PatientPaymentValidated)] = new PatientPaymentValidatedProjectionHandler(),
+            [nameof(Domain.Events.PatientClaimedForAttention)] = new PatientClaimedForAttentionProjectionHandler(),
+            [nameof(Domain.Events.PatientCalled)] = new PatientCalledProjectionHandler(),
+            [nameof(Domain.Events.PatientAttentionCompleted)] = new PatientAttentionCompletedProjectionHandler(),
         };
     }
 

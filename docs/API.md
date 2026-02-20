@@ -2,6 +2,8 @@
 
 Contrato HTTP vigente de `WaitingRoom.API` alineado al estado real del código.
 
+Modelo operativo definitivo (target de negocio): [OPERATING_MODEL.md](OPERATING_MODEL.md)
+
 ## Alcance y fuente de verdad
 
 Este documento describe los endpoints **publicados actualmente** en el pipeline HTTP principal.
@@ -50,7 +52,67 @@ Mapeo principal:
 
 ---
 
-## Command Endpoint
+## Command Endpoints
+
+## Recepción
+
+### POST /api/reception/register
+
+Registro clínico operativo (alias de check-in por rol de recepción).
+
+Mismo contrato de request/response que `POST /api/waiting-room/check-in`.
+
+## Taquilla
+
+### POST /api/cashier/call-next
+
+Llama siguiente paciente para pago, aplicando prioridad administrativa primero y FIFO dentro de nivel.
+
+### POST /api/cashier/validate-payment
+
+Valida pago y habilita paso a cola de consulta.
+
+### POST /api/cashier/mark-payment-pending
+
+Marca pago pendiente e incrementa contador de intentos (máximo 3).
+
+### POST /api/cashier/mark-absent
+
+Marca ausencia en taquilla y reencola paciente (máximo 2 reintentos).
+
+### POST /api/cashier/cancel-payment
+
+Cancela turno por política de pago (después de alcanzar intentos máximos).
+
+## Médico
+
+### POST /api/medical/consulting-room/activate
+
+Activa consultorio para habilitar llamados médicos desde ese consultorio.
+
+### POST /api/medical/consulting-room/deactivate
+
+Desactiva consultorio; desde ese momento no puede reclamar siguiente paciente.
+
+### POST /api/medical/call-next
+
+Reclama siguiente paciente para consulta.
+
+Regla clave: `stationId` debe corresponder a un consultorio activo, de lo contrario retorna `400` por violación de dominio.
+
+### POST /api/medical/start-consultation
+
+Inicia consulta para paciente en estado `LlamadoConsulta`.
+
+### POST /api/medical/finish-consultation
+
+Finaliza consulta para paciente en estado `EnConsulta`.
+
+### POST /api/medical/mark-absent
+
+Marca ausencia en consulta; primer ausente reintenta, segundo ausente cancela por ausencia.
+
+## Compatibilidad (legacy)
 
 ### POST /api/waiting-room/check-in
 
@@ -115,6 +177,88 @@ curl -X POST http://localhost:5000/api/waiting-room/check-in \
   }'
 ```
 
+### POST /api/waiting-room/claim-next
+
+Reclama el siguiente paciente a atender (prioridad clínica + orden de llegada).
+
+#### Request body
+
+```json
+{
+  "queueId": "QUEUE-01",
+  "actor": "doctor-001",
+  "stationId": "CONSULT-03"
+}
+```
+
+`stationId` es obligatorio en operación para cumplir la regla de consultorio activo.
+
+#### Response (200)
+
+```json
+{
+  "success": true,
+  "message": "Patient claimed successfully",
+  "correlationId": "3c3ad6dc-6725-4600-8968-6285a7a7b3a6",
+  "eventCount": 1,
+  "patientId": "PAT-001"
+}
+```
+
+### POST /api/waiting-room/call-patient
+
+Marca el paciente reclamado como llamado para atención.
+
+#### Request body
+
+```json
+{
+  "queueId": "QUEUE-01",
+  "patientId": "PAT-001",
+  "actor": "nurse-001"
+}
+```
+
+#### Response (200)
+
+```json
+{
+  "success": true,
+  "message": "Patient called successfully",
+  "correlationId": "abfced71-84db-4dbd-8004-f84db9f4cf31",
+  "eventCount": 1,
+  "patientId": "PAT-001"
+}
+```
+
+### POST /api/waiting-room/complete-attention
+
+Finaliza la atención del paciente activo.
+
+#### Request body
+
+```json
+{
+  "queueId": "QUEUE-01",
+  "patientId": "PAT-001",
+  "actor": "doctor-001",
+  "outcome": "resolved",
+  "notes": "Alta y control en 48h"
+}
+```
+
+#### Response (200)
+
+```json
+{
+  "success": true,
+  "message": "Attention completed successfully",
+  "correlationId": "237abf39-bfc2-4b93-8f7c-b6629b1512f6",
+  "eventCount": 1,
+  "patientId": "PAT-001"
+}
+```
+
 ---
 
 ## Health & Readiness
@@ -127,7 +271,7 @@ Verifica que el proceso está vivo.
 
 Verifica readiness completa (incluye chequeos de dependencias).
 
-### Ejemplo curl
+### Ejemplo curl (health)
 
 ```bash
 curl http://localhost:5000/health/live
@@ -146,19 +290,32 @@ Usar este endpoint para generación de cliente frontend o validación automátic
 
 ---
 
-## Estado de endpoints de query/proyecciones
+## Query Endpoints
 
-Existen implementaciones de query endpoints en:
-
-- `src/Services/WaitingRoom/WaitingRoom.API/Endpoints/WaitingRoomQueryEndpoints.cs`
-
-Ejemplos:
+Todos estos endpoints están publicados en runtime:
 
 - `GET /api/v1/waiting-room/{queueId}/monitor`
 - `GET /api/v1/waiting-room/{queueId}/queue-state`
+- `GET /api/v1/waiting-room/{queueId}/next-turn`
+- `GET /api/v1/waiting-room/{queueId}/recent-history?limit=20`
 - `POST /api/v1/waiting-room/{queueId}/rebuild`
 
-Actualmente **no están registrados** en `Program.cs`, por lo que no forman parte del contrato HTTP publicado hoy.
+### Ejemplo response `GET /api/v1/waiting-room/{queueId}/next-turn`
+
+```json
+{
+  "queueId": "QUEUE-01",
+  "patientId": "PAT-001",
+  "patientName": "Juan Pérez",
+  "priority": "high",
+  "consultationType": "General",
+  "status": "called",
+  "claimedAt": "2026-02-19T14:10:00Z",
+  "calledAt": "2026-02-19T14:11:00Z",
+  "stationId": "CONSULT-03",
+  "projectedAt": "2026-02-19T14:11:01Z"
+}
+```
 
 ---
 

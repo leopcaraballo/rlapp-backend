@@ -7,12 +7,15 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Xunit;
+using Xunit.Sdk;
 using WaitingRoom.Application.Commands;
 using WaitingRoom.Application.CommandHandlers;
+using WaitingRoom.Application.Exceptions;
 using WaitingRoom.Application.Ports;
 using WaitingRoom.Application.Services;
 using WaitingRoom.Domain.Events;
 using WaitingRoom.Domain.Aggregates;
+using WaitingRoom.Domain.Exceptions;
 using BuildingBlocks.Observability;
 using WaitingRoom.Infrastructure.Observability;
 using WaitingRoom.Infrastructure.Messaging;
@@ -45,6 +48,12 @@ public sealed class EventDrivenPipelineE2ETests : IAsyncLifetime
     private readonly string _testConnectionString;
     private readonly IServiceProvider _serviceProvider;
     private readonly CheckInPatientCommandHandler _commandHandler;
+    private readonly ActivateConsultingRoomCommandHandler _activateConsultingRoomHandler;
+    private readonly CallNextCashierCommandHandler _callNextCashierHandler;
+    private readonly ValidatePaymentCommandHandler _validatePaymentHandler;
+    private readonly ClaimNextPatientCommandHandler _claimHandler;
+    private readonly CallPatientCommandHandler _callHandler;
+    private readonly CompleteAttentionCommandHandler _completeHandler;
     private readonly ProjectionEventProcessor _projectionProcessor;
     private readonly IEventLagTracker _lagTracker;
     private readonly IEventStore _eventStore;
@@ -84,12 +93,24 @@ public sealed class EventDrivenPipelineE2ETests : IAsyncLifetime
 
         // Application
         services.AddScoped<CheckInPatientCommandHandler>();
+        services.AddScoped<ActivateConsultingRoomCommandHandler>();
+        services.AddScoped<CallNextCashierCommandHandler>();
+        services.AddScoped<ValidatePaymentCommandHandler>();
+        services.AddScoped<ClaimNextPatientCommandHandler>();
+        services.AddScoped<CallPatientCommandHandler>();
+        services.AddScoped<CompleteAttentionCommandHandler>();
 
         // Projections
         // (Projection setup would go here)
 
         _serviceProvider = services.BuildServiceProvider();
         _commandHandler = _serviceProvider.GetRequiredService<CheckInPatientCommandHandler>();
+        _activateConsultingRoomHandler = _serviceProvider.GetRequiredService<ActivateConsultingRoomCommandHandler>();
+        _callNextCashierHandler = _serviceProvider.GetRequiredService<CallNextCashierCommandHandler>();
+        _validatePaymentHandler = _serviceProvider.GetRequiredService<ValidatePaymentCommandHandler>();
+        _claimHandler = _serviceProvider.GetRequiredService<ClaimNextPatientCommandHandler>();
+        _callHandler = _serviceProvider.GetRequiredService<CallPatientCommandHandler>();
+        _completeHandler = _serviceProvider.GetRequiredService<CompleteAttentionCommandHandler>();
         _lagTracker = _serviceProvider.GetRequiredService<IEventLagTracker>();
         _eventStore = _serviceProvider.GetRequiredService<IEventStore>();
         _outboxStore = _serviceProvider.GetRequiredService<IOutboxStore>();
@@ -339,6 +360,317 @@ public sealed class EventDrivenPipelineE2ETests : IAsyncLifetime
             Assert.True(slowest[i].TotalLagMs >= slowest[i + 1].TotalLagMs,
                 "Events should be ordered by lag descending");
         }
+    }
+
+    [Fact]
+    public async Task FullClinicalFlow_CheckInClaimCallComplete_PersistsAllEvents()
+    {
+        await EnsureQueueExistsAsync("queue-flow-1", "Flow Queue", 20, CancellationToken.None);
+        await ActivateConsultingRoomsAsync("queue-flow-1", ["S-10"], CancellationToken.None);
+
+        await _commandHandler.HandleAsync(new CheckInPatientCommand
+        {
+            QueueId = "queue-flow-1",
+            PatientId = "patient-flow-1",
+            PatientName = "Patient Flow",
+            Priority = "High",
+            ConsultationType = "General",
+            Actor = "reception"
+        }, CancellationToken.None);
+
+        var cashierCall = await _callNextCashierHandler.HandleAsync(new CallNextCashierCommand
+        {
+            QueueId = "queue-flow-1",
+            Actor = "cashier-1",
+            CashierDeskId = "C-01"
+        }, CancellationToken.None);
+
+        await _validatePaymentHandler.HandleAsync(new ValidatePaymentCommand
+        {
+            QueueId = "queue-flow-1",
+            PatientId = cashierCall.PatientId,
+            Actor = "cashier-1",
+            PaymentReference = "PAY-001"
+        }, CancellationToken.None);
+
+        var claimResult = await _claimHandler.HandleAsync(new ClaimNextPatientCommand
+        {
+            QueueId = "queue-flow-1",
+            Actor = "doctor-a",
+            StationId = "S-10"
+        }, CancellationToken.None);
+
+        await _callHandler.HandleAsync(new CallPatientCommand
+        {
+            QueueId = "queue-flow-1",
+            PatientId = claimResult.PatientId,
+            Actor = "nurse-a"
+        }, CancellationToken.None);
+
+        await _completeHandler.HandleAsync(new CompleteAttentionCommand
+        {
+            QueueId = "queue-flow-1",
+            PatientId = claimResult.PatientId,
+            Actor = "doctor-a",
+            Outcome = "completed"
+        }, CancellationToken.None);
+
+        var events = (await _eventStore.GetEventsAsync("queue-flow-1", CancellationToken.None)).ToList();
+        Assert.Contains(events, e => e is PatientCheckedIn);
+        Assert.Contains(events, e => e is PatientClaimedForAttention);
+        Assert.Contains(events, e => e is PatientCalled);
+        Assert.Contains(events, e => e is PatientAttentionCompleted);
+    }
+
+    [Fact]
+    public async Task ClinicOperationalFlow_2Receptions4ConsultRooms1PaymentDesk_WorksUnderLoad()
+    {
+        const string queueId = "clinic-main-queue";
+        const int totalPatients = 24;
+        using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(60));
+        var cancellationToken = cts.Token;
+        var deadlineUtc = DateTime.UtcNow.AddSeconds(60);
+
+        await EnsureQueueExistsAsync(queueId, "Main Clinic Queue", 100, cancellationToken);
+        await ActivateConsultingRoomsAsync(
+            queueId,
+            Enumerable.Range(1, 4).Select(i => $"CONS-{i:00}").ToArray(),
+            cancellationToken);
+
+        var reception1Patients = Enumerable.Range(1, totalPatients / 2)
+            .Select(i => $"R1-P-{i:000}")
+            .ToList();
+
+        var reception2Patients = Enumerable.Range(1, totalPatients / 2)
+            .Select(i => $"R2-P-{i:000}")
+            .ToList();
+
+        var receptionTasks = new[]
+        {
+            Task.Run(async () =>
+            {
+                foreach (var patientId in reception1Patients)
+                {
+                    await ExecuteWithConcurrencyRetryAsync(async () =>
+                    {
+                        await _commandHandler.HandleAsync(new CheckInPatientCommand
+                        {
+                            QueueId = queueId,
+                            PatientId = patientId,
+                            PatientName = $"Patient {patientId}",
+                            Priority = "Medium",
+                            ConsultationType = "General",
+                            Actor = "reception-1"
+                        }, cancellationToken);
+                    });
+                }
+            }),
+            Task.Run(async () =>
+            {
+                foreach (var patientId in reception2Patients)
+                {
+                    await ExecuteWithConcurrencyRetryAsync(async () =>
+                    {
+                        await _commandHandler.HandleAsync(new CheckInPatientCommand
+                        {
+                            QueueId = queueId,
+                            PatientId = patientId,
+                            PatientName = $"Patient {patientId}",
+                            Priority = "High",
+                            ConsultationType = "General",
+                            Actor = "reception-2"
+                        }, cancellationToken);
+                    });
+                }
+            })
+        };
+
+        await Task.WhenAll(receptionTasks);
+
+        var paymentValidatedPatients = new System.Collections.Concurrent.ConcurrentDictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
+
+        while (paymentValidatedPatients.Count < totalPatients)
+        {
+            if (DateTime.UtcNow >= deadlineUtc)
+                throw new XunitException($"Timeout waiting for payment validation. Validated={paymentValidatedPatients.Count}, Expected={totalPatients}");
+
+            try
+            {
+                var cashierCall = await ExecuteWithConcurrencyRetryAsync(async () =>
+                    await _callNextCashierHandler.HandleAsync(new CallNextCashierCommand
+                    {
+                        QueueId = queueId,
+                        Actor = "payment-desk-1",
+                        CashierDeskId = "C-01"
+                    }, cancellationToken));
+
+                await ExecuteWithConcurrencyRetryAsync(async () =>
+                {
+                    await _validatePaymentHandler.HandleAsync(new ValidatePaymentCommand
+                    {
+                        QueueId = queueId,
+                        PatientId = cashierCall.PatientId,
+                        Actor = "payment-desk-1",
+                        PaymentReference = $"PAY-{cashierCall.PatientId}"
+                    }, cancellationToken);
+                });
+
+                paymentValidatedPatients.TryAdd(cashierCall.PatientId, true);
+            }
+            catch (DomainException)
+            {
+                await Task.Delay(10, cancellationToken);
+            }
+            catch (EventConflictException)
+            {
+                await Task.Delay(10, cancellationToken);
+            }
+            catch (Npgsql.PostgresException ex) when (ex.SqlState == "23505")
+            {
+                await Task.Delay(10, cancellationToken);
+            }
+        }
+
+        var completedPatients = new System.Collections.Concurrent.ConcurrentDictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
+        var paymentDeskQueue = new System.Collections.Concurrent.ConcurrentDictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
+
+        var consultRoomTasks = Enumerable.Range(1, 4)
+            .Select(roomNumber => Task.Run(async () =>
+            {
+                while (completedPatients.Count < totalPatients && DateTime.UtcNow < deadlineUtc)
+                {
+                    try
+                    {
+                        var claim = await ExecuteWithConcurrencyRetryAsync(async () =>
+                            await _claimHandler.HandleAsync(new ClaimNextPatientCommand
+                            {
+                                QueueId = queueId,
+                                Actor = $"consult-room-{roomNumber}",
+                                StationId = $"CONS-{roomNumber:00}"
+                            }, cancellationToken));
+
+                        await ExecuteWithConcurrencyRetryAsync(async () =>
+                        {
+                            await _callHandler.HandleAsync(new CallPatientCommand
+                            {
+                                QueueId = queueId,
+                                PatientId = claim.PatientId,
+                                Actor = $"consult-room-{roomNumber}-nurse"
+                            }, cancellationToken);
+                        });
+
+                        await ExecuteWithConcurrencyRetryAsync(async () =>
+                        {
+                            await _completeHandler.HandleAsync(new CompleteAttentionCommand
+                            {
+                                QueueId = queueId,
+                                PatientId = claim.PatientId,
+                                Actor = $"consult-room-{roomNumber}",
+                                Outcome = "completed",
+                                Notes = "Clinical flow completed"
+                            }, cancellationToken);
+                        });
+
+                        completedPatients.TryAdd(claim.PatientId, true);
+
+                        // Taquilla de pago simulada: registra que paciente llegó a caja
+                        paymentDeskQueue.TryAdd(claim.PatientId, true);
+                    }
+                    catch (DomainException)
+                    {
+                        await Task.Delay(10, cancellationToken);
+                    }
+                    catch (EventConflictException)
+                    {
+                        await Task.Delay(10, cancellationToken);
+                    }
+                    catch (Npgsql.PostgresException ex) when (ex.SqlState == "23505")
+                    {
+                        await Task.Delay(10, cancellationToken);
+                    }
+                }
+            }))
+            .ToArray();
+
+        await Task.WhenAll(consultRoomTasks);
+
+        if (completedPatients.Count != totalPatients)
+            throw new XunitException($"Timeout waiting for consultation completion. Completed={completedPatients.Count}, Expected={totalPatients}");
+
+        Assert.Equal(totalPatients, completedPatients.Count);
+        Assert.Equal(totalPatients, paymentDeskQueue.Count);
+
+        var events = (await _eventStore.GetEventsAsync(queueId, cancellationToken)).ToList();
+
+        Assert.Equal(totalPatients, events.OfType<PatientCheckedIn>().Count());
+        Assert.Equal(totalPatients, events.OfType<PatientCalledAtCashier>().Count());
+        Assert.Equal(totalPatients, events.OfType<PatientPaymentValidated>().Count());
+        Assert.Equal(totalPatients, events.OfType<PatientClaimedForAttention>().Count());
+        Assert.Equal(totalPatients, events.OfType<PatientCalled>().Count());
+        Assert.Equal(totalPatients, events.OfType<PatientAttentionCompleted>().Count());
+    }
+
+    private async Task ActivateConsultingRoomsAsync(
+        string queueId,
+        IReadOnlyCollection<string> consultingRoomIds,
+        CancellationToken cancellationToken)
+    {
+        foreach (var consultingRoomId in consultingRoomIds)
+        {
+            await _activateConsultingRoomHandler.HandleAsync(new ActivateConsultingRoomCommand
+            {
+                QueueId = queueId,
+                ConsultingRoomId = consultingRoomId,
+                Actor = "coordinator"
+            }, cancellationToken);
+        }
+    }
+
+    private static async Task ExecuteWithConcurrencyRetryAsync(
+        Func<Task> action,
+        int maxAttempts = 10)
+    {
+        for (var attempt = 1; attempt <= maxAttempts; attempt++)
+        {
+            try
+            {
+                await action();
+                return;
+            }
+            catch (EventConflictException) when (attempt < maxAttempts)
+            {
+                await Task.Delay(10 * attempt);
+            }
+            catch (Npgsql.PostgresException ex) when (ex.SqlState == "23505" && attempt < maxAttempts)
+            {
+                await Task.Delay(10 * attempt);
+            }
+        }
+
+        await action();
+    }
+
+    private static async Task<T> ExecuteWithConcurrencyRetryAsync<T>(
+        Func<Task<T>> action,
+        int maxAttempts = 10)
+    {
+        for (var attempt = 1; attempt <= maxAttempts; attempt++)
+        {
+            try
+            {
+                return await action();
+            }
+            catch (EventConflictException) when (attempt < maxAttempts)
+            {
+                await Task.Delay(10 * attempt);
+            }
+            catch (Npgsql.PostgresException ex) when (ex.SqlState == "23505" && attempt < maxAttempts)
+            {
+                await Task.Delay(10 * attempt);
+            }
+        }
+
+        return await action();
     }
 
     // ========================================================================

@@ -378,6 +378,12 @@ public async Task LoadAsync_With200Events_Should_CompleteUnder50ms()
 }
 ```
 
+## Operational Alignment (2026-02-20)
+
+- The expanded workflow adds more event types but keeps aggregate event volume within the expected short-lived queue range.
+- Current replay-based reconstruction remains adequate for payment/absence paths and consulting-room lifecycle events.
+- No change to the no-snapshot decision is required at this stage.
+
 ---
 
 ## References

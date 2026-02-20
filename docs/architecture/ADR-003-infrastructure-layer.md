@@ -59,3 +59,9 @@ Implement Infrastructure with:
 - Outbox status is updated after successful publish
 - Failed publish remains pending for retry
 - Read models use separate storage (PostgreSQL)
+
+## Operational Alignment (2026-02-20)
+
+- Infrastructure serialization and outbox publishing include the expanded operational event set used by the current workflow.
+- The same atomic persistence/publish guarantees apply to cashier and medical alternate-path events and consulting-room lifecycle events.
+- No infrastructure decision changed; this section confirms compatibility with the stricter state machine and role-based API surface.

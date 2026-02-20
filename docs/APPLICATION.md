@@ -2,6 +2,27 @@
 
 **Descripción paso a paso del flujo de ejecución de casos de uso.**
 
+## ✅ Estado runtime actual (2026-02-19)
+
+El flujo operativo vigente en aplicación es por rol:
+
+1. `POST /api/reception/register`
+2. `POST /api/cashier/call-next`
+3. `POST /api/cashier/validate-payment`
+4. `POST /api/medical/consulting-room/activate`
+5. `POST /api/medical/call-next` (requiere `stationId` activo)
+6. `POST /api/medical/start-consultation`
+7. `POST /api/medical/finish-consultation`
+
+Flujos alternos implementados:
+
+- `cashier/mark-payment-pending`
+- `cashier/mark-absent`
+- `cashier/cancel-payment`
+- `medical/mark-absent`
+
+Compatibilidad: los endpoints legacy `/api/waiting-room/*` siguen publicados para integración gradual.
+
 ---
 
 ## 🎯 Caso de Uso: Check-In de Paciente

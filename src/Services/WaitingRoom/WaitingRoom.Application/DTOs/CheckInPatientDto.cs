@@ -40,6 +40,16 @@ public sealed record CheckInPatientDto
     public required string ConsultationType { get; init; }
 
     /// <summary>
+    /// Optional patient age for automatic administrative priority.
+    /// </summary>
+    public int? Age { get; init; }
+
+    /// <summary>
+    /// Optional pregnancy flag for automatic administrative priority.
+    /// </summary>
+    public bool? IsPregnant { get; init; }
+
+    /// <summary>
     /// Optional notes about patient or consultation.
     /// </summary>
     public string? Notes { get; init; }

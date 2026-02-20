@@ -535,6 +535,12 @@ public async Task EndToEnd_Should_ProcessEvent()
 // ✅ Real infrastructure, confidence in production behavior
 ```
 
+## Operational Alignment (2026-02-20)
+
+- API adapters expose role-separated entry points for reception, cashier, and medical operations.
+- Application ports and domain core remain unchanged in dependency direction while supporting stricter workflow transitions.
+- Infrastructure adapters continue to be replaceable while handling expanded command/event traffic, including consulting-room lifecycle operations.
+
 ---
 
 ## References

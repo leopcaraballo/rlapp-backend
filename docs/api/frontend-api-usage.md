@@ -6,14 +6,34 @@ Guía práctica para que el frontend consuma la API de forma correcta, predecibl
 
 Basado en la configuración actual de `WaitingRoom.API/Program.cs`, los endpoints **activos** son:
 
+- `POST /api/reception/register`
+- `POST /api/cashier/call-next`
+- `POST /api/cashier/validate-payment`
+- `POST /api/cashier/mark-payment-pending`
+- `POST /api/cashier/mark-absent`
+- `POST /api/cashier/cancel-payment`
+- `POST /api/medical/consulting-room/activate`
+- `POST /api/medical/consulting-room/deactivate`
+- `POST /api/medical/call-next`
+- `POST /api/medical/start-consultation`
+- `POST /api/medical/finish-consultation`
+- `POST /api/medical/mark-absent`
 - `POST /api/waiting-room/check-in`
+- `POST /api/waiting-room/claim-next`
+- `POST /api/waiting-room/call-patient`
+- `POST /api/waiting-room/complete-attention`
+- `GET /api/v1/waiting-room/{queueId}/monitor`
+- `GET /api/v1/waiting-room/{queueId}/queue-state`
+- `GET /api/v1/waiting-room/{queueId}/next-turn`
+- `GET /api/v1/waiting-room/{queueId}/recent-history?limit=20`
+- `POST /api/v1/waiting-room/{queueId}/rebuild`
 - `GET /health/live`
 - `GET /health/ready`
 - `GET /openapi/v1.json` (solo en entorno Development)
 
 ### ¿Por qué importa esto?
 
-En `docs/API.md` aparecen endpoints de query (`/api/v1/waiting-room/{queueId}/...`), pero actualmente no están registrados en `Program.cs`. Para frontend, la fuente de verdad operativa es:
+Para frontend, la fuente de verdad operativa es:
 
 1. Endpoints mapeados en código.
 2. OpenAPI generado en runtime (`/openapi/v1.json`) cuando está disponible.
@@ -28,6 +48,23 @@ En `docs/API.md` aparecen endpoints de query (`/api/v1/waiting-room/{queueId}/..
 2. Enviar `POST /api/waiting-room/check-in`.
 3. Guardar y propagar `correlationId` de la respuesta para trazabilidad.
 4. Mostrar confirmación o error normalizado.
+
+### 2.2 Flujo operativo de atención
+
+1. `reception/register` para crear turno y prioridad automática.
+2. `cashier/call-next` para llamado en taquilla.
+3. `cashier/validate-payment` para habilitar consulta.
+4. `medical/consulting-room/activate` al inicio de jornada del consultorio.
+5. `medical/call-next` con `stationId` de consultorio activo.
+6. `medical/start-consultation` y `medical/finish-consultation`.
+7. Refrescar `next-turn`, `queue-state` y `recent-history` para UI en tiempo real.
+
+### 2.3 Reglas UX obligatorias por flujo
+
+- Si `medical/call-next` responde `400` por consultorio inactivo, pedir activación previa del consultorio.
+- Taquilla debe mostrar contador de intentos para pago pendiente (máximo 3).
+- Taquilla debe mostrar contador de ausencia (máximo 2 reintentos).
+- Consulta debe mostrar un único reintento por ausencia antes de cancelación.
 
 ### ¿Por qué así?
 
@@ -197,19 +234,12 @@ export interface ApiError {
 
 ---
 
-## 6) Diferencia entre “documentado” y “publicado”
+## 6) Endpoints de query para pantalla operativa
 
-Actualmente:
-
-- Hay endpoints de query documentados y con implementación parcial en `Endpoints/WaitingRoomQueryEndpoints.cs`.
-- Pero no están publicados en pipeline HTTP porque no se mapean en `Program.cs`.
-
-### Recomendación operativa para frontend
-
-Tomar como contrato vigente solo lo que esté:
-
-1. En OpenAPI runtime (`/openapi/v1.json`) o
-2. Confirmado en endpoints mapeados en `Program.cs`.
+- `GET /api/v1/waiting-room/{queueId}/monitor`: KPIs agregados.
+- `GET /api/v1/waiting-room/{queueId}/queue-state`: detalle de cola actual.
+- `GET /api/v1/waiting-room/{queueId}/next-turn`: turno activo o próximo candidato.
+- `GET /api/v1/waiting-room/{queueId}/recent-history`: trazabilidad reciente de atenciones.
 
 ---
 
@@ -229,6 +259,7 @@ Tomar como contrato vigente solo lo que esté:
 - `src/Services/WaitingRoom/WaitingRoom.API/Program.cs`
 - `src/Services/WaitingRoom/WaitingRoom.API/Middleware/CorrelationIdMiddleware.cs`
 - `src/Services/WaitingRoom/WaitingRoom.API/Middleware/ExceptionHandlerMiddleware.cs`
+- `src/Services/WaitingRoom/WaitingRoom.API/Endpoints/WaitingRoomQueryEndpoints.cs`
 - `src/Services/WaitingRoom/WaitingRoom.Application/DTOs/CheckInPatientDto.cs`
 - `src/Services/WaitingRoom/WaitingRoom.Domain/ValueObjects/Priority.cs`
 - `src/Services/WaitingRoom/WaitingRoom.Domain/ValueObjects/ConsultationType.cs`

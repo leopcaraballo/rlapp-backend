@@ -643,36 +643,26 @@ Esto permite que la API responda rápido sin esperar a que todos los proyeccione
 ### Queue Lifecycle
 
 ```
-                  POST /api/waiting-room/create-queue
-                              │
-                              ▼
-                    WaitingQueueCreated event
-                              │
-                              ▼
-                  ┌─────────────────────────┐
-                  │  WaitingQueue (Created) │
-                  │  - Id, Name, Capacity   │
-                  │  - Patients: []         │
-                  └────────┬────────────────┘
-                           │
-                           │ Patient 1 checks in
-                           ▼
-                  ┌──────────────────────────┐
-                  │  WaitingQueue (Updated)  │
-                  │  - Patients: [PAT-001]   │
-                  └────────┬─────────────────┘
-                           │
-                           │ Patient 2 checks in
-                           ▼
-                  ┌──────────────────────────┐
-                  │  WaitingQueue (Updated)  │
-                  │  - Patients: [PAT-001,   │
-                  │             PAT-002]     │
-                  └──────────────────────────┘
-                      ... at capacity ...
-                           ▲
-                           │ (rejected if full)
-                           │ DomainException
+POST /api/reception/register
+   -> EnEsperaTaquilla
+POST /api/cashier/call-next
+   -> EnTaquilla
+POST /api/cashier/validate-payment
+   -> PagoValidado -> EnEsperaConsulta
+POST /api/medical/consulting-room/activate
+   -> ConsultingRoomActivated
+POST /api/medical/call-next (stationId activo)
+   -> LlamadoConsulta
+POST /api/medical/start-consultation
+   -> EnConsulta
+POST /api/medical/finish-consultation
+   -> Finalizado
+
+Alternos:
+- cashier/mark-payment-pending -> PagoPendiente
+- cashier/mark-absent -> AusenteTaquilla -> EnEsperaTaquilla
+- cashier/cancel-payment -> CanceladoPorPago
+- medical/mark-absent -> AusenteConsulta (1 reintento) o CanceladoPorAusencia
 ```
 
 ---

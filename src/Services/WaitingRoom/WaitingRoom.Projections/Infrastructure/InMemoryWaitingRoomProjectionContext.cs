@@ -24,6 +24,8 @@ public sealed class InMemoryWaitingRoomProjectionContext : IWaitingRoomProjectio
     private readonly ConcurrentDictionary<string, ProjectionCheckpoint> _checkpoints = [];
     private readonly ConcurrentDictionary<string, WaitingRoomMonitorView> _monitorViews = [];
     private readonly ConcurrentDictionary<string, QueueStateView> _queueStateViews = [];
+    private readonly ConcurrentDictionary<string, NextTurnView> _nextTurnViews = [];
+    private readonly ConcurrentDictionary<string, List<RecentAttentionRecordView>> _recentAttentionByQueue = [];
     private readonly ConcurrentDictionary<string, bool> _processedIdempotencyKeys = [];
     private readonly ILogger<InMemoryWaitingRoomProjectionContext> _logger;
 
@@ -116,6 +118,14 @@ public sealed class InMemoryWaitingRoomProjectionContext : IWaitingRoomProjectio
         var stateKeysToRemove = _queueStateViews.Keys.ToList();
         foreach (var key in stateKeysToRemove)
             _queueStateViews.TryRemove(key, out _);
+
+        var nextTurnKeys = _nextTurnViews.Keys.ToList();
+        foreach (var key in nextTurnKeys)
+            _nextTurnViews.TryRemove(key, out _);
+
+        var historyKeys = _recentAttentionByQueue.Keys.ToList();
+        foreach (var key in historyKeys)
+            _recentAttentionByQueue.TryRemove(key, out _);
 
         _logger.LogInformation("Cleared projection data for {ProjectionId}", projectionId);
 
@@ -312,6 +322,78 @@ public sealed class InMemoryWaitingRoomProjectionContext : IWaitingRoomProjectio
         return Task.FromResult(view);
     }
 
+    public Task<NextTurnView?> GetNextTurnViewAsync(
+        string queueId,
+        CancellationToken cancellationToken = default)
+    {
+        if (string.IsNullOrWhiteSpace(queueId))
+            throw new ArgumentException("Queue ID required", nameof(queueId));
+
+        _nextTurnViews.TryGetValue(queueId, out var view);
+        return Task.FromResult<NextTurnView?>(view);
+    }
+
+    public Task SetNextTurnViewAsync(
+        string queueId,
+        NextTurnView? view,
+        CancellationToken cancellationToken = default)
+    {
+        if (string.IsNullOrWhiteSpace(queueId))
+            throw new ArgumentException("Queue ID required", nameof(queueId));
+
+        if (view is null)
+        {
+            _nextTurnViews.TryRemove(queueId, out _);
+            return Task.CompletedTask;
+        }
+
+        _nextTurnViews[queueId] = view;
+        return Task.CompletedTask;
+    }
+
+    public Task AddRecentAttentionRecordAsync(
+        string queueId,
+        RecentAttentionRecordView record,
+        CancellationToken cancellationToken = default)
+    {
+        if (string.IsNullOrWhiteSpace(queueId))
+            throw new ArgumentException("Queue ID required", nameof(queueId));
+
+        ArgumentNullException.ThrowIfNull(record);
+
+        var history = _recentAttentionByQueue.GetOrAdd(queueId, _ => []);
+
+        lock (history)
+        {
+            history.Insert(0, record);
+
+            if (history.Count > 100)
+                history.RemoveRange(100, history.Count - 100);
+        }
+
+        return Task.CompletedTask;
+    }
+
+    public Task<IReadOnlyList<RecentAttentionRecordView>> GetRecentAttentionHistoryAsync(
+        string queueId,
+        int limit,
+        CancellationToken cancellationToken = default)
+    {
+        if (string.IsNullOrWhiteSpace(queueId))
+            throw new ArgumentException("Queue ID required", nameof(queueId));
+
+        if (limit <= 0)
+            limit = 20;
+
+        if (!_recentAttentionByQueue.TryGetValue(queueId, out var history))
+            return Task.FromResult<IReadOnlyList<RecentAttentionRecordView>>([]);
+
+        lock (history)
+        {
+            return Task.FromResult<IReadOnlyList<RecentAttentionRecordView>>(history.Take(limit).ToList());
+        }
+    }
+
     public Task<IEnumerable<WaitingRoomMonitorView>> GetAllMonitorViewsAsync(
         CancellationToken cancellationToken = default)
     {
@@ -333,6 +415,8 @@ public sealed class InMemoryWaitingRoomProjectionContext : IWaitingRoomProjectio
 
         _queueStateViews.TryRemove(queueId, out _);
         _monitorViews.TryRemove(queueId, out _);
+        _nextTurnViews.TryRemove(queueId, out _);
+        _recentAttentionByQueue.TryRemove(queueId, out _);
 
         _logger.LogInformation("Cleared queue projection for {QueueId}", queueId);
 

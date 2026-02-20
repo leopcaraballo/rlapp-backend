@@ -347,6 +347,13 @@ public sealed class QueueStatusView
 - ❌ **Bypassing projections** — Never query event store directly in UI
 - ❌ **Sync reads after writes** — Embrace eventual consistency
 
+## Operational Alignment (2026-02-20)
+
+- Command side now includes explicit role flows: reception registration, cashier processing, and medical attention lifecycle.
+- Write model enforces payment and absence policies via dedicated commands/events before consultation progression.
+- Medical claim-next command is constrained by active consulting-room state, while read model remains projection-driven.
+- CQRS separation is preserved without changing the original decision.
+
 ---
 
 ## References

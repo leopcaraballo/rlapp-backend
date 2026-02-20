@@ -473,6 +473,12 @@ public async Task Replay_Should_HandleMixedVersions()
 | **Upcasting errors** | Detect transformation bugs |
 | **Replay duration** | Detect performance degradation |
 
+## Operational Alignment (2026-02-20)
+
+- Versioning strategy applies to the expanded operational event catalog (cashier alternates, consultation alternates, and consulting-room lifecycle events).
+- Additive evolution remains the preferred path for extending operational metadata without breaking replay.
+- This decision remains active and compatible with the strict state machine behavior documented in ADR-010.
+
 ---
 
 ## References

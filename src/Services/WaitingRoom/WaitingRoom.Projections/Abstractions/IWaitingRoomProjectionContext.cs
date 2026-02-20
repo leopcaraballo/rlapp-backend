@@ -75,6 +75,25 @@ public interface IWaitingRoomProjectionContext : IProjectionContext
         string queueId,
         CancellationToken cancellationToken = default);
 
+    Task<NextTurnView?> GetNextTurnViewAsync(
+        string queueId,
+        CancellationToken cancellationToken = default);
+
+    Task SetNextTurnViewAsync(
+        string queueId,
+        NextTurnView? view,
+        CancellationToken cancellationToken = default);
+
+    Task AddRecentAttentionRecordAsync(
+        string queueId,
+        RecentAttentionRecordView record,
+        CancellationToken cancellationToken = default);
+
+    Task<IReadOnlyList<RecentAttentionRecordView>> GetRecentAttentionHistoryAsync(
+        string queueId,
+        int limit,
+        CancellationToken cancellationToken = default);
+
     /// <summary>
     /// Clears all queue-related projection data.
     /// Used during rebuild.

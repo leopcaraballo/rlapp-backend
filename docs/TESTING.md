@@ -2,6 +2,38 @@
 
 **Estrategia de testing, cobertura, violaciones y desafíos.**
 
+## ✅ Actualización 2026-02-19 (flujo operativo completo)
+
+Se agregó cobertura explícita para las features nuevas del flujo clínico por rol:
+
+- Taquilla obligatoria con estados alternos (`PagoPendiente`, `AusenteTaquilla`, `CanceladoPorPago`)
+- Consulta con ausencia y cancelación por ausencia (`AusenteConsulta`, `CanceladoPorAusencia`)
+- Gestión de consultorios activos/inactivos para `medical/call-next`
+- Prevención de doble registro activo (reintentos de registro duplicado)
+
+Archivo principal de cobertura de flujo:
+
+- `src/Tests/WaitingRoom.Tests.Domain/Aggregates/WaitingQueueAttentionFlowTests.cs`
+
+Matriz mínima de casos (al menos 1 test por caso):
+
+- Registro inicial de paciente
+- Llamado a taquilla
+- Pago validado
+- Pago pendiente
+- Ausencia en taquilla
+- Cancelación por pago fallido
+- Llamado a consulta (claim)
+- Inicio de consulta
+- Finalización de consulta
+- Ausencia en consulta con segundo intento cancelado
+- Consultorio inactivo bloquea llamado
+- Activación/desactivación de consultorio
+
+Cobertura específica de duplicados en registro:
+
+- `CheckInPatient_SamePatient_MoreThanTwoAttempts_ThrowsOnSecondAndThirdAttempt`
+
 ---
 
 ## 🎯 Estrategia de Testing

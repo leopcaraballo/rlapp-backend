@@ -49,6 +49,20 @@ public static class WaitingRoomQueryEndpoints
             .Produces<QueueStateView>(StatusCodes.Status200OK)
             .Produces<ErrorResponse>(StatusCodes.Status404NotFound);
 
+        group.MapGet("/{queueId}/next-turn", GetNextTurnAsync)
+            .WithName("GetNextTurn")
+            .WithSummary("Get next operational turn")
+            .WithDescription("Returns the currently claimed/called patient; if none, returns next waiting patient candidate.")
+            .Produces<NextTurnView>(StatusCodes.Status200OK)
+            .Produces<ErrorResponse>(StatusCodes.Status404NotFound);
+
+        group.MapGet("/{queueId}/recent-history", GetRecentHistoryAsync)
+            .WithName("GetRecentHistory")
+            .WithSummary("Get recent completed attentions")
+            .WithDescription("Returns recent completed attentions for operational traceability.")
+            .Produces<IReadOnlyList<RecentAttentionRecordView>>(StatusCodes.Status200OK)
+            .Produces<ErrorResponse>(StatusCodes.Status404NotFound);
+
         group.MapPost("/{queueId}/rebuild", RebuildProjectionAsync)
             .WithName("RebuildProjection")
             .WithSummary("Rebuild projection from events (async)")
@@ -124,6 +138,84 @@ public static class WaitingRoomQueryEndpoints
                 });
 
             return Results.Ok(view);
+        }
+        catch (Exception)
+        {
+            return Results.InternalServerError();
+        }
+    }
+
+    private static async Task<IResult> GetNextTurnAsync(
+        string queueId,
+        IWaitingRoomProjectionContext context,
+        CancellationToken cancellationToken)
+    {
+        if (string.IsNullOrWhiteSpace(queueId))
+            return Results.BadRequest(new ErrorResponse
+            {
+                Error = "QueueId required",
+                StatusCode = 400
+            });
+
+        try
+        {
+            var activeTurn = await context.GetNextTurnViewAsync(queueId, cancellationToken);
+            if (activeTurn != null)
+                return Results.Ok(activeTurn);
+
+            var queue = await context.GetQueueStateViewAsync(queueId, cancellationToken);
+            if (queue == null)
+                return Results.NotFound(new ErrorResponse
+                {
+                    Error = $"Queue state not found for {queueId}",
+                    StatusCode = 404
+                });
+
+            var candidate = queue.PatientsInQueue.FirstOrDefault();
+            if (candidate == null)
+                return Results.NotFound(new ErrorResponse
+                {
+                    Error = $"No turn available for {queueId}",
+                    StatusCode = 404
+                });
+
+            return Results.Ok(new NextTurnView
+            {
+                QueueId = queueId,
+                PatientId = candidate.PatientId,
+                PatientName = candidate.PatientName,
+                Priority = candidate.Priority,
+                ConsultationType = "Pending",
+                Status = "waiting",
+                ClaimedAt = null,
+                CalledAt = null,
+                StationId = null,
+                ProjectedAt = DateTimeOffset.UtcNow
+            });
+        }
+        catch (Exception)
+        {
+            return Results.InternalServerError();
+        }
+    }
+
+    private static async Task<IResult> GetRecentHistoryAsync(
+        string queueId,
+        int limit,
+        IWaitingRoomProjectionContext context,
+        CancellationToken cancellationToken)
+    {
+        if (string.IsNullOrWhiteSpace(queueId))
+            return Results.BadRequest(new ErrorResponse
+            {
+                Error = "QueueId required",
+                StatusCode = 400
+            });
+
+        try
+        {
+            var history = await context.GetRecentAttentionHistoryAsync(queueId, limit <= 0 ? 20 : limit, cancellationToken);
+            return Results.Ok(history);
         }
         catch (Exception)
         {

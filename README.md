@@ -27,6 +27,8 @@ Un hospital necesita gestionar colas de espera con:
 
 **Solución:** Arquitectura event-driven donde cada interacción del paciente es un evento inmutable que reconstruye el estado actual del sistema.
 
+Modelo operativo clínico definitivo: [docs/OPERATING_MODEL.md](docs/OPERATING_MODEL.md)
+
 ---
 
 ## 🏗️ Arquitectura
@@ -352,11 +354,34 @@ Registra la entrada de un paciente a la cola de espera.
 
 **Estado actual de publicación de API:**
 
-- Expuesto y operativo: `POST /api/waiting-room/check-in`
+- Commands expuestos:
+  - `POST /api/reception/register`
+  - `POST /api/cashier/call-next`
+  - `POST /api/cashier/validate-payment`
+  - `POST /api/cashier/mark-payment-pending`
+  - `POST /api/cashier/mark-absent`
+  - `POST /api/cashier/cancel-payment`
+  - `POST /api/medical/consulting-room/activate`
+  - `POST /api/medical/consulting-room/deactivate`
+  - `POST /api/medical/call-next`
+  - `POST /api/medical/start-consultation`
+  - `POST /api/medical/finish-consultation`
+  - `POST /api/medical/mark-absent`
+  - `POST /api/waiting-room/check-in`
+  - `POST /api/waiting-room/claim-next`
+  - `POST /api/waiting-room/call-patient`
+  - `POST /api/waiting-room/complete-attention`
+- Queries expuestas:
+  - `GET /api/v1/waiting-room/{queueId}/monitor`
+  - `GET /api/v1/waiting-room/{queueId}/queue-state`
+  - `GET /api/v1/waiting-room/{queueId}/next-turn`
+  - `GET /api/v1/waiting-room/{queueId}/recent-history?limit=20`
+  - `POST /api/v1/waiting-room/{queueId}/rebuild`
 - Health checks: `GET /health/live`, `GET /health/ready`
 - OpenAPI (solo Development): `GET /openapi/v1.json`
 
-Los endpoints de query/proyecciones existen como implementación, pero no están publicados actualmente en el pipeline HTTP principal. Ver detalle en [API.md](docs/API.md).
+Flujo clínico recomendado: `reception/register` → `cashier/call-next` → `cashier/validate-payment` → `medical/consulting-room/activate` → `medical/call-next` → `medical/start-consultation` → `medical/finish-consultation`.
+Ver contrato detallado en [API.md](docs/API.md).
 
 ---
 

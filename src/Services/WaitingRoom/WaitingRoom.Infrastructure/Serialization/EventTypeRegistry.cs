@@ -40,6 +40,18 @@ public sealed class EventTypeRegistry
     public static EventTypeRegistry CreateDefault() =>
         new([
             typeof(WaitingQueueCreated),
-            typeof(PatientCheckedIn)
+            typeof(ConsultingRoomActivated),
+            typeof(ConsultingRoomDeactivated),
+            typeof(PatientCheckedIn),
+            typeof(PatientCalledAtCashier),
+            typeof(PatientPaymentValidated),
+            typeof(PatientPaymentPending),
+            typeof(PatientAbsentAtCashier),
+            typeof(PatientCancelledByPayment),
+            typeof(PatientClaimedForAttention),
+            typeof(PatientAbsentAtConsultation),
+            typeof(PatientCalled),
+            typeof(PatientAttentionCompleted),
+            typeof(PatientCancelledByAbsence)
         ]);
 }

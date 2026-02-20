@@ -6,7 +6,7 @@ Architectural diagrams following the C4 model (Context, Container, Component, Co
 **Notation:** Mermaid diagrams
 **Last Updated:** 2026-02-19
 
-> Runtime note: query/projection endpoints shown in component diagrams are implementation-level design. Current public contract is documented in [../API.md](../API.md).
+> Runtime note: command and query endpoints shown are part of the current public contract. Canonical API details are documented in [../API.md](../API.md).
 
 ---
 
@@ -34,13 +34,14 @@ Architectural diagrams following the C4 model (Context, Container, Component, Co
 ```mermaid
 graph TB
     subgraph "Healthcare Organization"
-        Nurse["👤 Nurse<br/>(Healthcare Staff)"]
+        Reception["👤 Reception Staff<br/>(Healthcare Staff)"]
+        Cashier["👤 Cashier Staff<br/>(Healthcare Staff)"]
         Doctor["👤 Doctor<br/>(Healthcare Staff)"]
         Admin["👤 Administrator<br/>(System Admin)"]
     end
 
     subgraph "RLAPP System"
-        RLAPP["RLAPP Backend<br/>(Event-Sourced WaitingRoom Service)<br/>Manages patient queues, check-in/out"]
+        RLAPP["RLAPP Backend<br/>(Event-Sourced WaitingRoom Service)<br/>Manages patient queue, cashier flow, and consultation workflow"]
     end
 
     subgraph "External Systems"
@@ -48,8 +49,9 @@ graph TB
         Monitoring["Monitoring System<br/>(Grafana + Prometheus)<br/>Observability & alerting"]
     end
 
-    Nurse -->|"Check in patients<br/>View queue status"| RLAPP
-    Doctor -->|"View waiting patients<br/>Call next patient"| RLAPP
+    Reception -->|"Register patients<br/>View queue status"| RLAPP
+    Cashier -->|"Call next at cashier<br/>Validate payment"| RLAPP
+    Doctor -->|"Activate consulting room<br/>Call/start/finish consultation"| RLAPP
     Admin -->|"Monitor system health<br/>Manage queues"| RLAPP
 
     RLAPP -.->|"Read patient data<br/>(Future integration)"| EHR
@@ -64,8 +66,9 @@ graph TB
 
 | Actor/System | Interacts With | Purpose |
 |--------------|----------------|---------|
-| **Nurse** | RLAPP Backend | Check in patients, view queue status, manage priorities |
-| **Doctor** | RLAPP Backend | View waiting patients, call next patient |
+| **Reception Staff** | RLAPP Backend | Register patients, view queue status |
+| **Cashier Staff** | RLAPP Backend | Call next at cashier, validate payment, manage payment exceptions |
+| **Doctor** | RLAPP Backend | Activate consulting room, call/start/finish consultation |
 | **Administrator** | RLAPP Backend | Monitor system health, configure queues |
 | **RLAPP Backend** | EHR (Future) | Retrieve patient medical history |
 | **RLAPP Backend** | Monitoring | Send metrics, logs, alerts |
@@ -83,7 +86,7 @@ graph TB
 ```mermaid
 graph TB
     subgraph "Users"
-        User["👤 Healthcare Staff<br/>(Nurse, Doctor)"]
+        User["👤 Healthcare Staff<br/>(Reception, Cashier, Doctor)"]
     end
 
     subgraph "RLAPP Backend System"
@@ -178,14 +181,18 @@ graph TB
 graph TB
     subgraph "WaitingRoom API (ASP.NET Core)"
         subgraph "Endpoints Layer"
-            CheckInEndpoint["CheckInPatient Endpoint<br/>(POST /api/waiting-room/check-in)"]
+            CheckInEndpoint["Reception Register Endpoint<br/>(POST /api/reception/register)"]
+            CashierEndpoint["Cashier Endpoint Cluster<br/>(POST /api/cashier/*)"]
+            MedicalEndpoint["Medical Endpoint Cluster<br/>(POST /api/medical/*)"]
             MonitorEndpoint["Monitor Endpoint<br/>(GET /api/v1/waiting-room/{id}/monitor)"]
             QueueStateEndpoint["QueueState Endpoint<br/>(GET /api/v1/waiting-room/{id}/queue-state)"]
+            NextTurnEndpoint["NextTurn Endpoint<br/>(GET /api/v1/waiting-room/{id}/next-turn)"]
+            HistoryEndpoint["RecentHistory Endpoint<br/>(GET /api/v1/waiting-room/{id}/recent-history)"]
             RebuildEndpoint["Rebuild Endpoint<br/>(POST /api/v1/waiting-room/{id}/rebuild)"]
         end
 
         subgraph "Application Layer"
-            CheckInHandler["CheckInPatientCommandHandler<br/>(Execute business logic)"]
+            CommandHandlers["Command Handlers<br/>(Reception, Cashier, Medical workflows)"]
             QueryHandler["Query Handlers<br/>(Read from projections)"]
 
             subgraph "Ports (Interfaces)"
@@ -197,8 +204,8 @@ graph TB
         end
 
         subgraph "Domain Layer"
-            WaitingQueue["WaitingQueue (Aggregate)<br/>CheckInPatient()<br/>DischargePatient()"]
-            DomainEvents["Domain Events<br/>PatientCheckedIn<br/>PatientDischarged"]
+            WaitingQueue["WaitingQueue (Aggregate)<br/>CheckInPatient()<br/>CallNextAtCashier()<br/>ClaimNextPatient()<br/>CompleteAttention()"]
+            DomainEvents["Domain Events<br/>PatientCheckedIn<br/>PatientPaymentValidated<br/>PatientClaimedForAttention<br/>PatientAttentionCompleted"]
             ValueObjects["Value Objects<br/>QueueId, PatientId, Priority"]
         end
 
@@ -206,7 +213,7 @@ graph TB
             PostgresEventStore["PostgresEventStore<br/>(implements IEventStore)<br/>SaveAsync(), LoadAsync()"]
             RabbitMqPublisher["RabbitMqEventPublisher<br/>(implements IEventPublisher)<br/>PublishAsync()"]
             SystemClock["SystemClock<br/>(implements IClock)<br/>UtcNow"]
-            ProjectionContext["WaitingRoomProjectionContext<br/>(implements IProjectionContext)<br/>GetMonitorViewAsync()"]
+            ProjectionContext["InMemoryWaitingRoomProjectionContext<br/>(implements IProjectionContext)<br/>GetMonitorViewAsync()"]
         end
     end
 
@@ -215,15 +222,19 @@ graph TB
         MQ["RabbitMQ<br/>(Topic Exchange)"]
     end
 
-    CheckInEndpoint -->|"calls"| CheckInHandler
+    CheckInEndpoint -->|"calls"| CommandHandlers
+    CashierEndpoint -->|"calls"| CommandHandlers
+    MedicalEndpoint -->|"calls"| CommandHandlers
     MonitorEndpoint -->|"calls"| QueryHandler
     QueueStateEndpoint -->|"calls"| QueryHandler
+    NextTurnEndpoint -->|"calls"| QueryHandler
+    HistoryEndpoint -->|"calls"| QueryHandler
     RebuildEndpoint -->|"triggers"| ProjectionContext
 
-    CheckInHandler -->|"uses"| IEventStore
-    CheckInHandler -->|"uses"| IEventPublisher
-    CheckInHandler -->|"uses"| IClock
-    CheckInHandler -->|"executes"| WaitingQueue
+    CommandHandlers -->|"uses"| IEventStore
+    CommandHandlers -->|"uses"| IEventPublisher
+    CommandHandlers -->|"uses"| IClock
+    CommandHandlers -->|"executes"| WaitingQueue
 
     QueryHandler -->|"uses"| IProjectionContext
 
@@ -237,14 +248,17 @@ graph TB
 
     PostgresEventStore -->|"SQL queries"| DB
     RabbitMqPublisher -->|"AMQP"| MQ
-    ProjectionContext -->|"SQL queries"| DB
 
     style CheckInEndpoint fill:#1168bd,stroke:#0b4884,color:#ffffff
+    style CashierEndpoint fill:#1168bd,stroke:#0b4884,color:#ffffff
+    style MedicalEndpoint fill:#1168bd,stroke:#0b4884,color:#ffffff
     style MonitorEndpoint fill:#1168bd,stroke:#0b4884,color:#ffffff
     style QueueStateEndpoint fill:#1168bd,stroke:#0b4884,color:#ffffff
+    style NextTurnEndpoint fill:#1168bd,stroke:#0b4884,color:#ffffff
+    style HistoryEndpoint fill:#1168bd,stroke:#0b4884,color:#ffffff
     style RebuildEndpoint fill:#1168bd,stroke:#0b4884,color:#ffffff
 
-    style CheckInHandler fill:#438dd5,stroke:#2e6295,color:#ffffff
+    style CommandHandlers fill:#438dd5,stroke:#2e6295,color:#ffffff
     style QueryHandler fill:#438dd5,stroke:#2e6295,color:#ffffff
 
     style WaitingQueue fill:#59c2e6,stroke:#3d8ea3,color:#000000
@@ -261,13 +275,15 @@ graph TB
 
 | Component | Responsibility | Dependencies | Testability |
 |-----------|---------------|--------------|-------------|
-| **CheckInPatient Endpoint** | Parse HTTP request, validate, call handler | CheckInPatientCommandHandler | Integration tests (HTTP) |
-| **CheckInPatientCommandHandler** | Orchestrate use case: load → execute → save | IEventStore, IEventPublisher, IClock, WaitingQueue | Unit tests (with fakes) |
+| **Reception Register Endpoint** | Parse HTTP request, validate, call handler | Command handlers | Integration tests (HTTP) |
+| **Cashier Endpoint Cluster** | Handle cashier workflow commands (`call-next`, `validate-payment`, alternates) | Command handlers + domain aggregate | Integration tests (HTTP) |
+| **Medical Endpoint Cluster** | Handle consulting-room and consultation workflow commands | Command handlers + domain aggregate | Integration tests (HTTP) |
+| **Command Handlers** | Orchestrate role workflows: load → execute → save → publish | IEventStore, IEventPublisher, IClock, WaitingQueue | Unit tests (with fakes) |
 | **WaitingQueue Aggregate** | Enforce business rules, emit events | None (pure domain) | Unit tests (no mocks) |
 | **PostgresEventStore** | Persist events to PostgreSQL Event Store | Npgsql, Dapper | Integration tests (real DB) |
 | **RabbitMqEventPublisher** | Publish events to RabbitMQ topic | RabbitMQ.Client | Integration tests (real MQ) |
 | **Query Handlers** | Retrieve data from projections | IWaitingRoomProjectionContext | Unit tests (with fakes) |
-| **ProjectionContext** | Query read models from PostgreSQL | Npgsql, Dapper | Integration tests (real DB) |
+| **ProjectionContext** | Query read models in runtime projection context | In-memory context implementation | Unit/integration tests |
 
 ---
 
@@ -284,7 +300,7 @@ sequenceDiagram
     participant EventStore as PostgresEventStore
     participant DB as PostgreSQL
 
-    Client->>API: POST /check-in
+    Client->>API: POST /api/reception/register
     API->>Handler: HandleAsync(command)
 
     Handler->>EventStore: LoadAsync(queueId)

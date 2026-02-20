@@ -82,7 +82,7 @@ public sealed class CheckInPatientCommandHandler
         {
             PatientId = PatientId.Create(command.PatientId),
             PatientName = command.PatientName,
-            Priority = Priority.Create(command.Priority),
+            Priority = Priority.Create(ResolvePriority(command)),
             ConsultationType = ConsultationType.Create(command.ConsultationType),
             CheckInTime = _clock.UtcNow,
             Metadata = metadata,
@@ -108,5 +108,16 @@ public sealed class CheckInPatientCommandHandler
 
         // STEP 5: Return result
         return eventsToPublish.Count;
+    }
+
+    private static string ResolvePriority(CheckInPatientCommand command)
+    {
+        if (command.IsPregnant == true)
+            return Priority.High;
+
+        if (command.Age.HasValue && (command.Age.Value < 18 || command.Age.Value > 65))
+            return Priority.High;
+
+        return command.Priority;
     }
 }

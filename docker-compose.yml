@@ -1,11 +1,74 @@
-version: "3.8"
-
 # =============================================================================
 # RLAPP Event-Driven Backend Infrastructure
 # Complete setup with PostgreSQL, RabbitMQ, Prometheus, Grafana, Seq
 # =============================================================================
 
 services:
+  # ===========================================================================
+  # WaitingRoom API
+  # ===========================================================================
+  api:
+    build:
+      context: .
+      dockerfile: src/Services/WaitingRoom/WaitingRoom.API/Dockerfile
+    container_name: rlapp-api
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      ASPNETCORE_URLS: http://+:8080
+      ConnectionStrings__EventStore: Host=postgres;Port=5432;Database=rlapp_waitingroom;Username=rlapp;Password=rlapp_secure_password
+      RabbitMq__HostName: rabbitmq
+      RabbitMq__Port: 5672
+      RabbitMq__UserName: guest
+      RabbitMq__Password: guest
+      RabbitMq__VirtualHost: /
+      RabbitMq__ExchangeName: rlapp.events
+      RabbitMq__ExchangeType: topic
+    ports:
+      - "5000:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "wget",
+          "--quiet",
+          "--tries=1",
+          "--spider",
+          "http://localhost:8080/health/live",
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    networks:
+      - rlapp-network
+
+  # ===========================================================================
+  # WaitingRoom Worker (Outbox Dispatcher)
+  # ===========================================================================
+  worker:
+    build:
+      context: .
+      dockerfile: src/Services/WaitingRoom/WaitingRoom.Worker/Dockerfile
+    container_name: rlapp-worker
+    environment:
+      DOTNET_ENVIRONMENT: Production
+      ConnectionStrings__EventStore: Host=postgres;Port=5432;Database=rlapp_waitingroom;Username=rlapp;Password=rlapp_secure_password
+      RabbitMq__HostName: rabbitmq
+      RabbitMq__Port: 5672
+    depends_on:
+      postgres:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+      api:
+        condition: service_started
+    networks:
+      - rlapp-network
+
   # ===========================================================================
   # PostgreSQL EventStore + Read Models
   # ===========================================================================

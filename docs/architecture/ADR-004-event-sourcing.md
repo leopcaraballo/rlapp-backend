@@ -270,6 +270,13 @@ Command → Aggregate → New Events → Event Store (append-only)
 - ✅ Replay performance metrics
 - ✅ Concurrency conflict rate
 
+## Operational Alignment (2026-02-20)
+
+- The current operational model (reception → cashier → medical) is fully represented as immutable domain events in the stream.
+- Alternate states (payment pending/absence/cancellations) are captured as first-class events, preserving full auditability.
+- Consultation-room activation/deactivation events are persisted under the same Event Sourcing guarantees.
+- This ADR decision remains unchanged and is now explicitly aligned with ADR-010 workflow enforcement.
+
 ---
 
 ## References

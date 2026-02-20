@@ -475,3 +475,12 @@ public WaitingQueue()
 | ADR-003 | Reflection Registry | 🟡 DEFERRED | Medium |
 
 All decisions respect SOLID principles and Clean Architecture.
+
+---
+
+## Operational Alignment (2026-02-20)
+
+- This ADR remains valid for the current clinical workflow and state machine defined in ADR-010.
+- Request objects now cover role-driven operations beyond check-in, including cashier and medical actions.
+- The same pattern is used for commands that enforce payment policies, absence retries, and consultation-room activation/deactivation.
+- This decision supports auditability because command intent remains explicit before event emission.

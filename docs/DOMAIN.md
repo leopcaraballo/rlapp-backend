@@ -22,6 +22,12 @@ Un hospital necesita:
 
 Un **event-sourced aggregate** que mantiene la cola y genera eventos para cada acción.
 
+Estado funcional actual:
+
+- Flujo estricto recepción → taquilla → consulta
+- Estados alternos para pago pendiente, ausencias y cancelaciones
+- Consultorios activos/inactivos con validación para llamada médica
+
 ---
 
 ## 🏛️ Agregado: WaitingQueue
@@ -43,6 +49,9 @@ public sealed class WaitingQueue : AggregateRoot
     public string QueueName { get; private set; }             // "Reception A"
     public int MaxCapacity { get; private set; }              // 20
     public List<WaitingPatient> Patients { get; private set; } // [PAT-001, PAT-002]
+    public string? CurrentCashierPatientId { get; private set; }
+    public string? CurrentAttentionPatientId { get; private set; }
+    public IReadOnlyCollection<string> ActiveConsultingRooms { get; }
 
     // Audit
     public DateTime CreatedAt { get; private set; }
@@ -56,14 +65,18 @@ public sealed class WaitingQueue : AggregateRoot
         EventMetadata metadata)  // For audit trail
 
     // Operations
-    public void CheckInPatient(
-        PatientId patientId,
-        string patientName,
-        Priority priority,
-        ConsultationType consultationType,
-        DateTime checkInTime,
-        EventMetadata metadata,
-        string? notes = null)
+    public void CheckInPatient(CheckInPatientRequest request)
+    public string CallNextAtCashier(CallNextCashierRequest request)
+    public void ValidatePayment(ValidatePaymentRequest request)
+    public void MarkPaymentPending(MarkPaymentPendingRequest request)
+    public void MarkAbsentAtCashier(MarkAbsentAtCashierRequest request)
+    public void CancelByPayment(CancelByPaymentRequest request)
+    public string ClaimNextPatient(ClaimNextPatientRequest request)
+    public void CallPatient(CallPatientRequest request)
+    public void CompleteAttention(CompleteAttentionRequest request)
+    public void MarkAbsentAtConsultation(MarkAbsentAtConsultationRequest request)
+    public void ActivateConsultingRoom(ActivateConsultingRoomRequest request)
+    public void DeactivateConsultingRoom(DeactivateConsultingRoomRequest request)
 
     // Query
     public int CurrentCount => Patients.Count;
