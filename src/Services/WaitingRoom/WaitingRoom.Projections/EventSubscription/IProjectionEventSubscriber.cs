@@ -242,7 +242,17 @@ internal sealed class RabbitMqProjectionEventSubscriber : IProjectionEventSubscr
                 {
                     _channel.BasicNack(args.DeliveryTag, false, true);
                 }
-                catch { }
+                catch (Exception nackEx)
+                {
+                    // Nack failed - notify but don't throw  
+                    // (already in error handler, message will be redelivered on reconnect)
+                    ErrorOccurred?.Invoke(this, new ErrorOccurredArgs
+                    {
+                        Exception = nackEx,
+                        Message = $"Failed to nack message {args.DeliveryTag}: {nackEx.Message}",
+                        OccurredAt = DateTime.UtcNow
+                    });
+                }
             }
         }
     }
