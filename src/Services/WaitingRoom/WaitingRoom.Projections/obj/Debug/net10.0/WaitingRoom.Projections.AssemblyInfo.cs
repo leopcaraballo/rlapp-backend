@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("WaitingRoom.Projections")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+b313b40cacafbbd2fcde25560f91670839f21219")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+821d64392633b2fffc8a090fd66cb7bf8722486d")]
 [assembly: System.Reflection.AssemblyProductAttribute("WaitingRoom.Projections")]
 [assembly: System.Reflection.AssemblyTitleAttribute("WaitingRoom.Projections")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
