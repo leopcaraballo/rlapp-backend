@@ -1,7 +1,16 @@
 {
   "github.copilot.chat.codeGeneration.useInstructionFiles": true,
   "github.copilot.chat.codeGeneration.instructions": [
-    ".ai/AGENT_BIBLE.md",
-    ".ai/AGENT_RUNTIME.md"
-  ]
+    { "file": ".ai/AGENT_BOOTSTRAP.md" },
+    { "file": ".ai/AGENT_BIBLE.md" },
+    { "file": ".ai/AGENT_RUNTIME.md" }
+  ],
+  "chat.tools.terminal.autoApprove": {
+    "/^cd /home/lcaraballo/Documentos/Sofka\\\\ Projects/Projects/rlapp-backend && dotnet --version$/": {
+      "approve": true,
+      "matchCommandLine": true
+    },
+    "dotnet clean": true,
+    "dotnet build": true
+  }
 }

@@ -1,0 +1,27 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <NoWarn>$(NoWarn);CS1591</NoWarn>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <LangVersion>latest</LangVersion>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="../WaitingRoom.Application/WaitingRoom.Application.csproj" />
+    <ProjectReference Include="../WaitingRoom.Domain/WaitingRoom.Domain.csproj" />
+    <ProjectReference Include="../../../BuildingBlocks/BuildingBlocks.EventSourcing/BuildingBlocks.EventSourcing.csproj" />
+    <ProjectReference Include="../../../BuildingBlocks/BuildingBlocks.Messaging/BuildingBlocks.Messaging.csproj" />
+    <ProjectReference Include="../../../BuildingBlocks/BuildingBlocks.Observability/BuildingBlocks.Observability.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="9.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="9.0.0" />
+    <PackageReference Include="RabbitMQ.Client" Version="6.8.1" />
+  </ItemGroup>
+
+</Project>

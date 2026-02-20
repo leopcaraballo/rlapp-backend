@@ -1,0 +1,245 @@
+# =============================================================================
+# RLAPP Event-Driven Backend Infrastructure
+# Complete setup with PostgreSQL, RabbitMQ, Prometheus, Grafana, Seq
+# =============================================================================
+
+services:
+  # ===========================================================================
+  # WaitingRoom API
+  # ===========================================================================
+  api:
+    build:
+      context: .
+      dockerfile: src/Services/WaitingRoom/WaitingRoom.API/Dockerfile
+    container_name: rlapp-api
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      ASPNETCORE_URLS: http://+:8080
+      ConnectionStrings__EventStore: Host=postgres;Port=5432;Database=rlapp_waitingroom;Username=rlapp;Password=rlapp_secure_password
+      RabbitMq__HostName: rabbitmq
+      RabbitMq__Port: 5672
+      RabbitMq__UserName: guest
+      RabbitMq__Password: guest
+      RabbitMq__VirtualHost: /
+      RabbitMq__ExchangeName: rlapp.events
+      RabbitMq__ExchangeType: topic
+    ports:
+      - "5000:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "wget",
+          "--quiet",
+          "--tries=1",
+          "--spider",
+          "http://localhost:8080/health/live",
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    networks:
+      - rlapp-network
+
+  # ===========================================================================
+  # WaitingRoom Worker (Outbox Dispatcher)
+  # ===========================================================================
+  worker:
+    build:
+      context: .
+      dockerfile: src/Services/WaitingRoom/WaitingRoom.Worker/Dockerfile
+    container_name: rlapp-worker
+    environment:
+      DOTNET_ENVIRONMENT: Production
+      ConnectionStrings__EventStore: Host=postgres;Port=5432;Database=rlapp_waitingroom;Username=rlapp;Password=rlapp_secure_password
+      RabbitMq__HostName: rabbitmq
+      RabbitMq__Port: 5672
+    depends_on:
+      postgres:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+      api:
+        condition: service_started
+    networks:
+      - rlapp-network
+
+  # ===========================================================================
+  # PostgreSQL EventStore + Read Models
+  # ===========================================================================
+  postgres:
+    image: postgres:16-alpine
+    container_name: rlapp-postgres
+    environment:
+      POSTGRES_USER: rlapp
+      POSTGRES_PASSWORD: rlapp_secure_password
+      POSTGRES_INITDB_ARGS: "-c max_connections=200"
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./infrastructure/postgres/init.sql:/docker-entrypoint-initdb.d/01-init.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U rlapp"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - rlapp-network
+    labels:
+      monitoring: "true"
+
+  # ===========================================================================
+  # RabbitMQ Message Broker (Topic-based event distribution)
+  # ===========================================================================
+  rabbitmq:
+    image: rabbitmq:3.12-management-alpine
+    container_name: rlapp-rabbitmq
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+      RABBITMQ_DEFAULT_VHOST: "/"
+    ports:
+      - "5672:5672" # AMQP protocol
+      - "15672:15672" # Management UI
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+      - ./infrastructure/rabbitmq/rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf:ro
+      - ./infrastructure/rabbitmq/init-rabbitmq.sh:/docker-entrypoint-initdb.d/init-rabbitmq.sh:ro
+    healthcheck:
+      test: rabbitmq-diagnostics -q ping
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - rlapp-network
+    labels:
+      monitoring: "true"
+
+  # ===========================================================================
+  # Prometheus — Metrics Collection & Storage
+  # ===========================================================================
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: rlapp-prometheus
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yml"
+      - "--storage.tsdb.path=/prometheus"
+      - "--web.console.libraries=/usr/share/prometheus/console_libraries"
+      - "--web.console.templates=/usr/share/prometheus/consoles"
+      - "--storage.tsdb.retention.time=30d"
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./infrastructure/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - ./infrastructure/prometheus/alert-rules.yml:/etc/prometheus/alert-rules.yml:ro
+      - prometheus_data:/prometheus
+    networks:
+      - rlapp-network
+    depends_on:
+      - postgres
+      - rabbitmq
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "wget",
+          "--quiet",
+          "--tries=1",
+          "--spider",
+          "http://localhost:9090/-/healthy",
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ===========================================================================
+  # Grafana — Visualization & Dashboards (Lag Monitoring)
+  # ===========================================================================
+  grafana:
+    image: grafana/grafana:latest
+    container_name: rlapp-grafana
+    environment:
+      GF_SECURITY_ADMIN_USER: admin
+      GF_SECURITY_ADMIN_PASSWORD: admin123
+      GF_INSTALL_PLUGINS: grafana-clock-panel,grafana-simple-json-datasource
+      GF_USERS_ALLOW_SIGN_UP: "false"
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./infrastructure/grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./infrastructure/grafana/dashboards:/var/lib/grafana/dashboards:ro
+      - grafana_data:/var/lib/grafana
+    networks:
+      - rlapp-network
+    depends_on:
+      - prometheus
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/api/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ===========================================================================
+  # Seq — Structured Logging & Event Inspection
+  # ===========================================================================
+  seq:
+    image: datalust/seq:latest
+    container_name: rlapp-seq
+    environment:
+      ACCEPT_EULA: "Y"
+      SEQ_FIRSTRUN_ADMINPASSWORD: "admin123"
+    ports:
+      - "5341:80" # Ingestion API
+      - "8081:80" # UI (mapped from 80)
+    volumes:
+      - seq_data:/data
+    networks:
+      - rlapp-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:80/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ===========================================================================
+  # PgAdmin — PostgreSQL Administration UI
+  # ===========================================================================
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: rlapp-pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@rlapp.local
+      PGADMIN_DEFAULT_PASSWORD: admin123
+    ports:
+      - "5050:80"
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+    networks:
+      - rlapp-network
+    depends_on:
+      - postgres
+
+networks:
+  rlapp-network:
+    driver: bridge
+    name: rlapp-network
+
+volumes:
+  postgres_data:
+    driver: local
+  rabbitmq_data:
+    driver: local
+  prometheus_data:
+    driver: local
+  grafana_data:
+    driver: local
+  seq_data:
+    driver: local
+  pgadmin_data:
+    driver: local

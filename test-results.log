@@ -1,0 +1,154 @@
+Compilación iniciada a las 19/2/2026 17:42:24.
+     1>Proyecto "/home/lcaraballo/Documentos/Sofka Projects/Projects/rlapp-backend/RLAPP.slnx" en el nodo 1 (VSTest destinos).
+     1>ValidateSolutionConfiguration:
+         Compilando la configuración de soluciones "Release|Any CPU".
+Serie de pruebas para /home/lcaraballo/Documentos/Sofka Projects/Projects/rlapp-backend/src/Tests/WaitingRoom.Tests.Application/bin/Release/net10.0/WaitingRoom.Tests.Application.dll (.NETCoreApp,Version=v10.0)
+Versión 18.0.1 (x64) de VSTest
+
+Iniciando la ejecución de pruebas, espere...
+1 archivos de prueba en total coincidieron con el patrón especificado.
+Serie de pruebas para /home/lcaraballo/Documentos/Sofka Projects/Projects/rlapp-backend/src/Tests/WaitingRoom.Tests.Domain/bin/Release/net10.0/WaitingRoom.Tests.Domain.dll (.NETCoreApp,Version=v10.0)
+Versión 18.0.1 (x64) de VSTest
+
+Serie de pruebas para /home/lcaraballo/Documentos/Sofka Projects/Projects/rlapp-backend/src/Tests/WaitingRoom.Tests.Integration/bin/Release/net10.0/WaitingRoom.Tests.Integration.dll (.NETCoreApp,Version=v10.0)
+Serie de pruebas para /home/lcaraballo/Documentos/Sofka Projects/Projects/rlapp-backend/src/Tests/WaitingRoom.Tests.Projections/bin/Release/net10.0/WaitingRoom.Tests.Projections.dll (.NETCoreApp,Version=v10.0)
+Versión 18.0.1 (x64) de VSTest
+
+Iniciando la ejecución de pruebas, espere...
+Versión 18.0.1 (x64) de VSTest
+
+1 archivos de prueba en total coincidieron con el patrón especificado.
+Iniciando la ejecución de pruebas, espere...
+1 archivos de prueba en total coincidieron con el patrón especificado.
+Iniciando la ejecución de pruebas, espere...
+1 archivos de prueba en total coincidieron con el patrón especificado.
+[xUnit.net 00:00:00.01] xUnit.net VSTest Adapter v3.1.4+50e68bbb8b (64-bit .NET 10.0.3)
+[xUnit.net 00:00:00.01] xUnit.net VSTest Adapter v3.1.4+50e68bbb8b (64-bit .NET 10.0.3)
+[xUnit.net 00:00:00.37]   Discovering: WaitingRoom.Tests.Application
+[xUnit.net 00:00:00.48]   Discovered:  WaitingRoom.Tests.Application
+[xUnit.net 00:00:00.57]   Starting:    WaitingRoom.Tests.Application
+[xUnit.net 00:00:00.30]   Discovering: WaitingRoom.Tests.Domain
+[xUnit.net 00:00:00.49]   Discovered:  WaitingRoom.Tests.Domain
+[xUnit.net 00:00:00.01] xUnit.net VSTest Adapter v2.8.2+699d445a1a (64-bit .NET 10.0.3)
+[xUnit.net 00:00:00.61]   Starting:    WaitingRoom.Tests.Domain
+[xUnit.net 00:00:00.01] xUnit.net VSTest Adapter v2.5.3.1+6b60a9e56a (64-bit .NET 10.0.3)
+     Warning:
+     The component "Fluent Assertions" is governed by the rules defined in the Xceed License Agreement and
+     the Xceed Fluent Assertions Community License. You may use Fluent Assertions free of charge for
+     non-commercial use only. An active subscription is required to use Fluent Assertions for commercial use.
+     Please contact Xceed Sales mailto:sales@xceed.com to acquire a subscription at a very low cost.
+     A paid commercial license supports the development and continued increasing support of
+     Fluent Assertions users under both commercial and community licenses. Help us
+     keep Fluent Assertions at the forefront of unit testing.
+     For more information, visit https://xceed.com/products/unit-testing/fluent-assertions/
+     Warning:
+     The component "Fluent Assertions" is governed by the rules defined in the Xceed License Agreement and
+     the Xceed Fluent Assertions Community License. You may use Fluent Assertions free of charge for
+     non-commercial use only. An active subscription is required to use Fluent Assertions for commercial use.
+     Please contact Xceed Sales mailto:sales@xceed.com to acquire a subscription at a very low cost.
+     A paid commercial license supports the development and continued increasing support of
+     Fluent Assertions users under both commercial and community licenses. Help us
+     keep Fluent Assertions at the forefront of unit testing.
+     For more information, visit https://xceed.com/products/unit-testing/fluent-assertions/
+[xUnit.net 00:00:00.41]   Discovering: WaitingRoom.Tests.Integration
+[xUnit.net 00:00:01.21]   Finished:    WaitingRoom.Tests.Application
+[xUnit.net 00:00:00.40]   Discovering: WaitingRoom.Tests.Projections
+  Correctas [xUnit.net 00:00:00.63]   Discovered:  WaitingRoom.Tests.Integration
+WaitingRoom.Tests.Domain.Aggregates.WaitingQueueTests.Create_WithZeroCapacity_ThrowsDomainException [24 ms]
+  Correctas WaitingRoom.Tests.Domain.ValueObjects.PatientIdTests.Create_WithEmptyString_ThrowsDomainException [11 ms]
+  Correctas WaitingRoom.Tests.Domain.UnitTest1.Test1 [7 ms]
+  Correctas WaitingRoom.Tests.Domain.ValueObjects.PatientIdTests.Equality_SameValue_AreEqual [69 ms]
+  Correctas WaitingRoom.Tests.Domain.ValueObjects.PriorityTests.Create_WithValidPriority_ReturnsPriority(priorityValue: "Medium", expectedLevel: 2) [104 ms]
+  Correctas WaitingRoom.Tests.Domain.ValueObjects.PriorityTests.Create_WithValidPriority_ReturnsPriority(priorityValue: "High", expectedLevel: 3) [< 1 ms]
+  Correctas WaitingRoom.Tests.Domain.ValueObjects.PriorityTests.Create_WithValidPriority_ReturnsPriority(priorityValue: "Urgent", expectedLevel: 4) [< 1 ms]
+  Correctas WaitingRoom.Tests.Domain.Aggregates.WaitingQueueTests.CheckInPatient_MultiplePatients_MaintainsOrder [73 ms]
+  Correctas WaitingRoom.Tests.Domain.ValueObjects.ConsultationTypeTests.Create_WithValidType_ReturnsConsultationType [105 ms]
+  Correctas WaitingRoom.Tests.Domain.ValueObjects.PatientIdTests.Create_WithWhitespace_TrimsMutex [3 ms]
+  Correctas WaitingRoom.Tests.Domain.ValueObjects.PriorityTests.Create_WithValidPriority_ReturnsPriority(priorityValue: "Low", expectedLevel: 1) [< 1 ms]
+  Correctas WaitingRoom.Tests.Domain.Events.PatientCheckedInTests.Event_HasCorrectEventName [107 ms]
+  Correctas WaitingRoom.Tests.Domain.ValueObjects.ConsultationTypeTests.Create_WithEmpty_ThrowsDomainException [4 ms]
+  Correctas WaitingRoom.Tests.Domain.ValueObjects.ConsultationTypeTests.Create_WithSingleCharacter_ThrowsDomainException [< 1 ms]
+  Correctas WaitingRoom.Tests.Domain.ValueObjects.ConsultationTypeTests.Create_WithWhitespace_Trims [< 1 ms]
+  Correctas WaitingRoom.Tests.Domain.ValueObjects.ConsultationTypeTests.Create_WithTooLong_ThrowsDomainException [< 1 ms]
+  Correctas WaitingRoom.Tests.Domain.ValueObjects.PatientIdTests.Create_WithNull_ThrowsDomainException [8 ms]
+  Correctas WaitingRoom.Tests.Domain.ValueObjects.PatientIdTests.Create_WithValidId_ReturnsPatientId [< 1 ms]
+  Correctas WaitingRoom.Tests.Domain.ValueObjects.PatientIdTests.Equality_DifferentValue_AreNotEqual [< 1 ms]
+  Correctas WaitingRoom.Tests.Domain.ValueObjects.PatientIdTests.Create_WithWhitespaceOnly_ThrowsDomainException [< 1 ms]
+  Correctas WaitingRoom.Tests.Domain.ValueObjects.PriorityTests.Level_HigherPriority_HasHigherLevel [14 ms]
+  Correctas WaitingRoom.Tests.Domain.ValueObjects.PriorityTests.Create_WithInvalidPriority_ThrowsDomainException [< 1 ms]
+  Correctas WaitingRoom.Tests.Domain.ValueObjects.PriorityTests.Create_WithWhitespaceOnly_ThrowsDomainException [< 1 ms]
+  Correctas WaitingRoom.Tests.Domain.ValueObjects.PriorityTests.Create_WithEmpty_ThrowsDomainException [< 1 ms]
+  Correctas WaitingRoom.Tests.Domain.ValueObjects.PriorityTests.Create_WithNull_ThrowsDomainException [< 1 ms]
+  Correctas WaitingRoom.Tests.Domain.Events.PatientCheckedInTests.Event_HasMetadata [20 ms]
+  Correctas WaitingRoom.Tests.Domain.Events.PatientCheckedInTests.Event_IsImmutable_CannotModify [< 1 ms]
+  Correctas WaitingRoom.Tests.Domain.Events.PatientCheckedInTests.Event_WithMissingQueueId_ThrowsWhenValidated [< 1 ms]
+  Correctas WaitingRoom.Tests.Domain.ValueObjects.PriorityTests.Create_WithWhitespace_Trims [5 ms]
+  Correctas WaitingRoom.Tests.Domain.Events.PatientCheckedInTests.Create_WithValidData_CreatesEvent [< 1 ms]
+  Correctas WaitingRoom.Tests.Domain.Events.PatientCheckedInTests.Event_Deterministic_SameInputProducesSameStructure [< 1 ms]
+  Correctas WaitingRoom.Tests.Domain.Aggregates.WaitingQueueTests.CheckInPatient_WithValidData_EmitsPatientCheckedInEvent [22 ms]
+  Correctas WaitingRoom.Tests.Domain.Aggregates.WaitingQueueTests.Event_IsDeterministic_SameInputProducesSameResult [1 ms]
+  Correctas WaitingRoom.Tests.Domain.Aggregates.WaitingQueueTests.Create_WithValidData_CreatesQueue [4 ms]
+  Correctas WaitingRoom.Tests.Domain.Aggregates.WaitingQueueTests.CheckInPatient_AtCapacity_ThrowsDomainException [1 ms]
+  Correctas WaitingRoom.Tests.Domain.Aggregates.WaitingQueueTests.Capacity_Properties_ReturnCorrectValues [7 ms]
+[xUnit.net 00:00:00.99]   Finished:    WaitingRoom.Tests.Domain
+[xUnit.net 00:00:00.64]   Starting:    WaitingRoom.Tests.Integration
+[xUnit.net 00:00:00.53]   Discovered:  WaitingRoom.Tests.Projections
+[xUnit.net 00:00:00.53]   Starting:    WaitingRoom.Tests.Projections
+  Correctas WaitingRoom.Tests.Domain.Aggregates.WaitingQueueTests.CheckInPatient_DuplicatePatient_ThrowsDomainException [< 1 ms]
+  Correctas WaitingRoom.Tests.Domain.Aggregates.WaitingQueueTests.Create_WithInvalidQueueName_ThrowsDomainException [< 1 ms]
+  Correctas WaitingRoom.Tests.Domain.Aggregates.WaitingQueueTests.ClearUncommittedEvents_AppliesToState [< 1 ms]
+
+La serie de pruebas se ejecutó correctamente.
+Pruebas totales: 39
+     Correcto: 39
+ Tiempo total: 2,7001 Segundos
+  Correctas WaitingRoom.Tests.Application.CommandHandlers.CheckInPatientCommandHandlerTests.HandleAsync_QueueNotFound_ThrowsAggregateNotFoundException [304 ms]
+  Correctas WaitingRoom.Tests.Application.CommandHandlers.CheckInPatientCommandHandlerTests.HandleAsync_ValidCommand_SavesAndPublishesEvents [76 ms]
+  Correctas WaitingRoom.Tests.Application.CommandHandlers.CheckInPatientCommandHandlerTests.HandleAsync_ConcurrentModification_ThrowsEventConflictException [12 ms]
+  Correctas WaitingRoom.Tests.Application.CommandHandlers.CheckInPatientCommandHandlerTests.HandleAsync_AfterSuccessfulSave_PublishesAllEvents [33 ms]
+  Correctas WaitingRoom.Tests.Application.CommandHandlers.CheckInPatientCommandHandlerTests.HandleAsync_CommandPreservesIdempotencyKey_InfrastructureCanEnforceDedupplication [7 ms]
+  Correctas WaitingRoom.Tests.Application.CommandHandlers.CheckInPatientCommandHandlerTests.HandleAsync_WithCorrelationId_PreservesForTracing [18 ms]
+  Correctas WaitingRoom.Tests.Application.CommandHandlers.CheckInPatientCommandHandlerTests.HandleAsync_QueueAtCapacity_ThrowsDomainException [5 ms]
+
+La serie de pruebas se ejecutó correctamente.
+Pruebas totales: 7
+     Correcto: 7
+ Tiempo total: 3,3501 Segundos
+[xUnit.net 00:00:00.82]   Finished:    WaitingRoom.Tests.Projections
+  Correctas WaitingRoom.Tests.Projections.Idempotency.PatientCheckedInIdempotencyTests.handler_maintains_priority_order_in_queue [69 ms]
+  Correctas WaitingRoom.Tests.Projections.Replay.ProjectionReplayTests.replay_with_different_event_order_produces_consistent_final_state [65 ms]
+  Correctas WaitingRoom.Tests.Projections.Idempotency.PatientCheckedInIdempotencyTests.handler_is_idempotent_same_event_twice_produces_same_state [7 ms]
+  Correctas WaitingRoom.Tests.Projections.Idempotency.PatientCheckedInIdempotencyTests.handler_duplicate_event_does_not_add_patient_twice [2 ms]
+  Correctas WaitingRoom.Tests.Projections.Idempotency.PatientCheckedInIdempotencyTests.handler_processes_normal_priority_correctly [5 ms]
+  Correctas WaitingRoom.Tests.Projections.Idempotency.PatientCheckedInIdempotencyTests.handler_adds_patient_to_queue_state [3 ms]
+  Correctas WaitingRoom.Tests.Projections.Idempotency.PatientCheckedInIdempotencyTests.handler_processes_high_priority_correctly [20 ms]
+  Correctas WaitingRoom.Tests.Projections.Replay.ProjectionReplayTests.deterministic_replay_with_large_event_stream [96 ms]
+  Correctas WaitingRoom.Tests.Projections.Replay.ProjectionReplayTests.rebuild_from_replay_produces_identical_state [3 ms]
+
+La serie de pruebas se ejecutó correctamente.
+Pruebas totales: 9
+     Correcto: 9
+ Tiempo total: 2,7797 Segundos
+  Correctas WaitingRoom.Tests.Integration.Worker.OutboxDispatcherTests.DispatchBatchAsync_MultipleMessages_ProcessesAll [412 ms]
+  Correctas WaitingRoom.Tests.Integration.Worker.OutboxDispatcherTests.DispatchBatchAsync_PublishFails_MarksAsFailed [22 ms]
+  Correctas WaitingRoom.Tests.Integration.Worker.OutboxDispatcherTests.DispatchBatchAsync_NoPendingMessages_ReturnsZero [13 ms]
+  Correctas WaitingRoom.Tests.Integration.Worker.OutboxDispatcherTests.DispatchBatchAsync_PendingMessages_PublishesAndMarksDispatched [4 ms]
+  Correctas WaitingRoom.Tests.Integration.Worker.OutboxDispatcherTests.DispatchBatchAsync_ExceedsMaxRetries_MarksPermanentlyFailed [7 ms]
+  Correctas WaitingRoom.Tests.Integration.Worker.OutboxDispatcherTests.DispatchBatchAsync_PartialFailure_DispatchesSuccessfulOnes [4 ms]
+  Correctas WaitingRoom.Tests.Integration.EndToEnd.EventDrivenPipelineE2ETests.SlowestEvents_CorrectlyIdentified_ForDebugging [4 s]
+[xUnit.net 00:00:06.89]   Finished:    WaitingRoom.Tests.Integration
+  Correctas WaitingRoom.Tests.Integration.EndToEnd.EventDrivenPipelineE2ETests.ProcessEvent_Idempotent_SameEventTwiceProducesSameState [39 ms]
+  Correctas WaitingRoom.Tests.Integration.EndToEnd.EventDrivenPipelineE2ETests.LagStatistics_MultipleEvents_ComputedCorrectly [564 ms]
+  Correctas WaitingRoom.Tests.Integration.EndToEnd.EventDrivenPipelineE2ETests.FullPipeline_CheckInPatient_RealizesCorrectly [33 ms]
+
+La serie de pruebas se ejecutó correctamente.
+Pruebas totales: 10
+     Correcto: 10
+ Tiempo total: 8,5600 Segundos
+     1>Compilación del proyecto terminada "/home/lcaraballo/Documentos/Sofka Projects/Projects/rlapp-backend/RLAPP.slnx" (VSTest destinos).
+
+Compilación correcta.
+    0 Advertencia(s)
+    0 Errores
+
+Tiempo transcurrido 00:00:11.03

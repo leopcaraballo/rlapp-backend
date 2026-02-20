@@ -1,0 +1,28 @@
+{
+  "version": 2,
+  "dgSpecHash": "FSZBkZIVepE=",
+  "success": true,
+  "projectFilePath": "/home/lcaraballo/Documentos/Sofka Projects/Projects/rlapp-backend/src/Services/WaitingRoom/WaitingRoom.API/WaitingRoom.API.csproj",
+  "expectedPackageFiles": [
+    "/home/lcaraballo/.nuget/packages/aspnetcore.healthchecks.npgsql/9.0.0/aspnetcore.healthchecks.npgsql.9.0.0.nupkg.sha512",
+    "/home/lcaraballo/.nuget/packages/dapper/2.1.35/dapper.2.1.35.nupkg.sha512",
+    "/home/lcaraballo/.nuget/packages/microsoft.aspnetcore.openapi/10.0.0/microsoft.aspnetcore.openapi.10.0.0.nupkg.sha512",
+    "/home/lcaraballo/.nuget/packages/microsoft.extensions.dependencymodel/8.0.2/microsoft.extensions.dependencymodel.8.0.2.nupkg.sha512",
+    "/home/lcaraballo/.nuget/packages/microsoft.openapi/2.0.0/microsoft.openapi.2.0.0.nupkg.sha512",
+    "/home/lcaraballo/.nuget/packages/newtonsoft.json/13.0.3/newtonsoft.json.13.0.3.nupkg.sha512",
+    "/home/lcaraballo/.nuget/packages/npgsql/8.0.5/npgsql.8.0.5.nupkg.sha512",
+    "/home/lcaraballo/.nuget/packages/rabbitmq.client/6.8.1/rabbitmq.client.6.8.1.nupkg.sha512",
+    "/home/lcaraballo/.nuget/packages/serilog/4.0.0/serilog.4.0.0.nupkg.sha512",
+    "/home/lcaraballo/.nuget/packages/serilog.aspnetcore/8.0.3/serilog.aspnetcore.8.0.3.nupkg.sha512",
+    "/home/lcaraballo/.nuget/packages/serilog.enrichers.environment/3.0.1/serilog.enrichers.environment.3.0.1.nupkg.sha512",
+    "/home/lcaraballo/.nuget/packages/serilog.enrichers.thread/4.0.0/serilog.enrichers.thread.4.0.0.nupkg.sha512",
+    "/home/lcaraballo/.nuget/packages/serilog.extensions.hosting/8.0.0/serilog.extensions.hosting.8.0.0.nupkg.sha512",
+    "/home/lcaraballo/.nuget/packages/serilog.extensions.logging/8.0.0/serilog.extensions.logging.8.0.0.nupkg.sha512",
+    "/home/lcaraballo/.nuget/packages/serilog.formatting.compact/2.0.0/serilog.formatting.compact.2.0.0.nupkg.sha512",
+    "/home/lcaraballo/.nuget/packages/serilog.settings.configuration/8.0.4/serilog.settings.configuration.8.0.4.nupkg.sha512",
+    "/home/lcaraballo/.nuget/packages/serilog.sinks.console/6.0.0/serilog.sinks.console.6.0.0.nupkg.sha512",
+    "/home/lcaraballo/.nuget/packages/serilog.sinks.debug/2.0.0/serilog.sinks.debug.2.0.0.nupkg.sha512",
+    "/home/lcaraballo/.nuget/packages/serilog.sinks.file/5.0.0/serilog.sinks.file.5.0.0.nupkg.sha512"
+  ],
+  "logs": []
+}
